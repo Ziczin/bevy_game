@@ -1,87 +1,37 @@
+mod components;
+mod systems;
+mod macros;
+mod resources;
+
 use bevy::prelude::*;
-
-
-#[derive(Component)]
-struct Person;
-
-#[derive(Component)]
-struct Name(String);
-
-#[derive(Component)]
-struct Scientist;
-
-#[derive(Resource)]
-struct GreetTimer(Timer);
-
-#[derive(Resource)]
-struct ScienceTimer(Timer);
-
-#[derive(Resource)]
-struct MarriegeTimer(Timer);
-
-fn add_people(mut commands: Commands) {
-    commands.spawn((Person, Name("Elaina Proctor".to_string())));
-    commands.spawn((Person, Name("Renzo Hume".to_string()), Scientist));
-    commands.spawn((Person, Name("Zayna Nieves".to_string())));
-}
-
-fn greet_people(
-    time: Res<Time>,
-    mut timer: ResMut<GreetTimer>,
-    query: Query<&Name, With<Person>>
-) {
-    let mut idx: i32 = 0;
-    if timer.0.tick(time.delta()).just_finished() {
-        for name in &query {
-            println!("{} Hello {}!", idx, name.0);
-            idx += 1;
-        }
-    }
-}
-
-fn update_people(
-    time: Res<Time>,
-    mut timer: ResMut<MarriegeTimer>,
-    mut query: Query<&mut Name, With<Person>>
-) {
-    if timer.0.tick(time.delta()).just_finished() {
-        for mut name in &mut query {
-            if name.0 == "Elaina Proctor" {
-                name.0 = "Elaina Hume".to_string();
-                break;
-            }
-        }
-    }
-}
-
-fn scientist_do_science(
-    time: Res<Time>,
-    mut timer: ResMut<ScienceTimer>,
-    query: Query<&Name, With<Scientist>>
-) {
-    if timer.0.tick(time.delta()).just_finished() {
-        for name in &query {
-            println!("{} do some science!", name.0);
-        }
-    }
-}
-
-pub struct HelloWorldPlugin;
-
-impl Plugin for HelloWorldPlugin {
-    fn build(&self, app: &mut App) {
-        app.insert_resource(GreetTimer(Timer::from_seconds(1.0, TimerMode::Repeating)));
-        app.insert_resource(ScienceTimer(Timer::from_seconds(2.5, TimerMode::Repeating)));
-        app.insert_resource(MarriegeTimer(Timer::from_seconds(5.0, TimerMode::Once)));
-
-        app.add_systems(Startup, add_people);
-        app.add_systems(Update, (scientist_do_science, update_people, greet_people));
-    }
-}
+use bevy_spritesheet_animation::prelude::*;
+use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
 
 fn main() {
     App::new()
-        .add_plugins(MinimalPlugins)
-        .add_plugins(HelloWorldPlugin)
+        .add_plugins((
+            DefaultPlugins.set(ImagePlugin::default_nearest()),
+            FrameTimeDiagnosticsPlugin::default(),
+            SpritesheetAnimationPlugin,
+        ))
+        .add_systems(Startup, (
+            systems::setup::summon::player,
+            systems::setup::summon::red_slime,
+            systems::setup::ground::spawn_tiles,
+        ))
+        .add_systems(Update, (
+            systems::movement::player::handle_input,
+            systems::base::apply_velocity,
+            systems::movement::follow::lerp_follow_to_player,
+            systems::behavior::red_slime::brain,
+            systems::behavior::red_slime::behavior,
+        ))
+        .insert_resource(
+            resources::behavior::RedSlimeConfig {
+                chase_speed: 0.0,
+                chase_distance_start: 1000.0,
+                chase_distance_end: 100.0,
+            }
+        )
         .run();
 }
