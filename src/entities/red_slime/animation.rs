@@ -12,7 +12,7 @@ pub fn create_walk_animation(
         .add_cell(3, 0)
         .add_cell(2, 0)
         .set_clip_direction(AnimationDirection::PingPong)
-        .set_duration(AnimationDuration::PerFrame(100))
+        .set_duration(AnimationDuration::PerFrame(75))
         .set_repetitions(AnimationRepeat::Loop)
         .build()
     );
@@ -25,7 +25,8 @@ pub fn create_idle_animation(
     return animations.add(
         spritesheet
         .create_animation()
-        .add_partial_row(0, ..2)
+        .add_partial_row(0, ..3)
+        .set_clip_direction(AnimationDirection::PingPong)
         .set_duration(AnimationDuration::PerFrame(1234))
         .build()
     );
