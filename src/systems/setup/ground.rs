@@ -24,7 +24,7 @@ pub fn spawn_tiles(asset_server: Res<AssetServer>, mut commands: Commands) {
                 Transform::from_xyz(
                     x as f32 * TILE_SIZE - offset_x,
                     y as f32 * TILE_SIZE - offset_y,
-                    -1.0,
+                    -offset_y - 10.0,
                 ),
                 Tile,
             ));

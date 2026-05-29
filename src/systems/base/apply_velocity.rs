@@ -8,5 +8,6 @@ pub fn apply_velocity(
     for (mut tr, vel) in query.iter_mut() {
         tr.translation.x += vel.x * time.delta_secs();
         tr.translation.y += vel.y * time.delta_secs();
+        tr.translation.z = -tr.translation.y;
     }
 }
