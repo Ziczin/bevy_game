@@ -1,7 +1,8 @@
 mod components;
 mod systems;
 mod macros;
-mod resources;
+mod entities;
+mod core;
 
 use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
@@ -14,24 +15,16 @@ fn main() {
             FrameTimeDiagnosticsPlugin::default(),
             SpritesheetAnimationPlugin,
         ))
+        .add_plugins(( // Entities
+            entities::RedSlime,
+            entities::Player,
+        ))
         .add_systems(Startup, (
-            systems::setup::summon::player,
-            systems::setup::summon::red_slime,
             systems::setup::ground::spawn_tiles,
         ))
         .add_systems(Update, (
-            systems::movement::player::handle_input,
             systems::base::apply_velocity,
-            systems::movement::follow::lerp_follow_to_player,
-            systems::behavior::red_slime::brain,
-            systems::behavior::red_slime::behavior,
+            systems::movement::lerp_follow::lerp_follow_to_player,
         ))
-        .insert_resource(
-            resources::behavior::RedSlimeConfig {
-                chase_speed: 0.0,
-                chase_distance_start: 1000.0,
-                chase_distance_end: 100.0,
-            }
-        )
         .run();
 }

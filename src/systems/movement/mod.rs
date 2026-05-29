@@ -1,2 +1,1 @@
-pub mod follow;
-pub mod player;
+pub mod lerp_follow;

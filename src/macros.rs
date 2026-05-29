@@ -9,9 +9,11 @@ macro_rules! markers {
 
 macro_rules! animation_states {
     ($name:ident { $($field:ident),* $(,)? }) => {
-        #[derive(Component, Default)]
-        pub struct $name {
-            $(pub $field: Handle<bevy_spritesheet_animation::prelude::Animation>,)*
+        ::paste::paste! {
+            #[derive(::bevy::prelude::Component, Default)]
+            pub struct [< $name Animation >] {
+                $(pub $field: ::bevy::prelude::Handle<bevy_spritesheet_animation::prelude::Animation>,)*
+            }
         }
     };
 }
@@ -57,14 +59,12 @@ macro_rules! behavior_states {
             #[derive(::bevy::prelude::Component)]
             pub struct [< $name StateHandler >] {
                 pub current: [< $name State >],
-                pub previous: [< $name State >],
             }
 
             impl Default for [< $name StateHandler >] {
                 fn default() -> Self {
                     Self {
                         current: [< $name State >]::$first,
-                        previous: [< $name State >]::$first,
                     }
                 }
             }
@@ -74,11 +74,12 @@ macro_rules! behavior_states {
                     Self::default()
                 }
 
-                pub fn set(&mut self, new_state: [< $name State >]) {
-                    if self.previous != self.current {
-                        self.previous = self.current;
+                pub fn set(&mut self, new_state: [< $name State >]) -> bool {
+                    if self.current != new_state {
                         self.current = new_state;
+                        return true;
                     }
+                    return false;
                 }
 
                 pub fn get(&self) -> [< $name State >] {
@@ -88,6 +89,7 @@ macro_rules! behavior_states {
         }
     };
 }
+
 
 pub(crate) use markers;
 pub(crate) use resource;
