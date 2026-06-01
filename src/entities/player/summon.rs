@@ -1,8 +1,8 @@
 use bevy::prelude::*;
+use avian2d::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 
 use crate::core::make_spritesheet;
-use crate::components::core::Velocity;
 use crate::components::behavior::FollowPlayer;
 use crate::components::markers::Player;
 
@@ -40,7 +40,8 @@ pub fn summon(
         },
         //Phy
         Transform::from_xyz(0.0, 0.0, 0.0),
-        Velocity::default(),
+        RigidBody::Dynamic,
+        Collider::rectangle(1.0, 1.0),
         //Beh
         PlayerStateHandler::default(),
         Player,

@@ -1,8 +1,8 @@
 use bevy::prelude::*;
+use avian2d::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 
 use crate::core::make_spritesheet;
-use crate::components::core::Velocity;
 use super::state::{RedSlimeAnimation, RedSlimeStateHandler};
 use super::animation::{create_idle_animation, create_walk_animation};
 
@@ -32,7 +32,8 @@ pub fn summon(
         },
         //Phy
         Transform::from_xyz(200.0, 0.0, 0.0),
-        Velocity::default(),
+        RigidBody::Dynamic,
+        Collider::rectangle(1.0, 1.0),
         //Beh
         RedSlimeStateHandler::default(),
     ));
