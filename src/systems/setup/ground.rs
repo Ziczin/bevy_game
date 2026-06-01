@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
+use crate::components::markers::DepthOrderedDraw;
+#[allow(unused_imports)]
 use bevy_spritesheet_animation::prelude::*;
 
 use crate::core::make_spritesheet;
@@ -41,6 +43,7 @@ pub fn spawn_fences(
     mut commands: Commands,
     mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
+    #[allow(unused_variables)]
     let (spritesheet, mut sprite) = make_spritesheet(
         &asset_server, &mut atlas_layouts,
         "textures/ground/fence_map.png",
@@ -51,8 +54,14 @@ pub fn spawn_fences(
 
     commands.spawn((
         sprite,
-        Transform::from_xyz(0.0, 0.0, 1.0),
+        DepthOrderedDraw,
+        Transform::from_xyz(64.0, 64.0, 1.0),
         RigidBody::Static,
-        Collider::rectangle(1.0, 1.0),
-    ));
+    ))
+    .with_children(|children| {
+        children.spawn((
+            Collider::rectangle(64.0, 4.0),
+            Transform::from_xyz(0.0, -28.0, 0.0),
+        ));
+    });
 }

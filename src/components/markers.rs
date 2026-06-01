@@ -3,4 +3,5 @@ use crate::macros::markers;
 
 markers! {
     Player,
+    DepthOrderedDraw,
 }

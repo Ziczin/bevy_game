@@ -2,7 +2,6 @@ use bevy::prelude::*;
 use avian2d::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 
-use crate::components::core::Velocity;
 use crate::components::markers::Player;
 
 use super::state::{MOVING_SPEED, PlayerStateHandler, PlayerState, PlayerAnimation};
@@ -28,7 +27,7 @@ pub fn handle_input(
     }
 
     for (mut velocity, mut sprite_sheet, mut state_handler, animation) in &mut player {
-        let physics_speed = MOVING_SPEED / 32.0;
+        let physics_speed = MOVING_SPEED;
         velocity.x = direction.x * physics_speed;
         velocity.y = direction.y * physics_speed;
         if velocity.length() > 0.0 {

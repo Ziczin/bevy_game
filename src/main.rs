@@ -11,11 +11,21 @@ use bevy_spritesheet_animation::prelude::*;
 fn main() {
     App::new()
         .add_plugins((
-            PhysicsPlugins::default().with_length_unit(32.0),
+            systems::base::BaseSystemsPlugin,
+            PhysicsPlugins::default(),
+            PhysicsDebugPlugin::default(),
             DefaultPlugins.set(ImagePlugin::default_nearest()),
             SpritesheetAnimationPlugin,
         ))
         .insert_resource(Gravity::ZERO)
+        .insert_gizmo_config(
+            PhysicsGizmos {
+                aabb_color: Some(Color::srgb(1.0, 1.0, 1.0)), // Белый цвет для AABB
+                collider_color: Some(Color::srgb(1.0, 1.0, 0.0)), // Желтый цвет для контуров
+                ..default()
+            },
+            GizmoConfig::default(),
+        )
         .add_plugins(( // Entities
             entities::RedSlime,
             entities::Player,
