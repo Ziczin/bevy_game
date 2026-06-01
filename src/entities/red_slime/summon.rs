@@ -34,6 +34,7 @@ pub fn summon(
         Transform::from_xyz(200.0, 0.0, 0.0),
         RigidBody::Dynamic,
         Collider::rectangle(1.0, 1.0),
+        LockedAxes::ROTATION_LOCKED,
         //Beh
         RedSlimeStateHandler::default(),
     ));

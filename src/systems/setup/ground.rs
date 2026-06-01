@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
+use bevy_spritesheet_animation::prelude::*;
+
+use crate::core::make_spritesheet;
 
 const TILE_SIZE: f32 = 64.0;
 const GRID_WIDTH: usize = 24;
@@ -38,28 +41,17 @@ pub fn spawn_fences(
     mut commands: Commands,
     mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    let fence_image = asset_server.load("textures/ground/fence_map.png");
-    let layout = TextureAtlasLayout::from_grid(UVec2::new(16, 16), 4, 4, None, None);
-    let layout_handle = atlas_layouts.add(layout);
+    let (spritesheet, mut sprite) = make_spritesheet(
+        &asset_server, &mut atlas_layouts,
+        "textures/ground/fence_map.png",
+        4, 4, 64, 64, 64.0, 64.0
+    );
 
-    let row = 0;
-    let col = 3;
-    let index = row * 4 + col;
+    sprite.texture_atlas.as_mut().unwrap().index = 15;
 
     commands.spawn((
-        SpriteSheetBundle {
-            texture: fence_image,
-            atlas: TextureAtlas {
-                layout: layout_handle,
-                index,
-            },
-            sprite: Sprite {
-                custom_size: Some(Vec2::splat(64.0)),
-                ..default()
-            },
-            transform: Transform::from_xyz(0.0, 0.0, 1.0),
-            ..default()
-        },
+        sprite,
+        Transform::from_xyz(0.0, 0.0, 1.0),
         RigidBody::Static,
         Collider::rectangle(1.0, 1.0),
     ));

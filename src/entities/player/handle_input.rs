@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use avian2d::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 
 use crate::components::core::Velocity;
@@ -9,7 +10,7 @@ use super::state::{MOVING_SPEED, PlayerStateHandler, PlayerState, PlayerAnimatio
 pub fn handle_input(
     keyboard: Res<ButtonInput<KeyCode>>,
     mut player: Query<(
-        &mut Velocity,
+        &mut LinearVelocity,
         &mut SpritesheetAnimation,
         &mut PlayerStateHandler,
         &PlayerAnimation,
@@ -27,8 +28,9 @@ pub fn handle_input(
     }
 
     for (mut velocity, mut sprite_sheet, mut state_handler, animation) in &mut player {
-        velocity.x = direction.x * MOVING_SPEED;
-        velocity.y = direction.y * MOVING_SPEED;
+        let physics_speed = MOVING_SPEED / 32.0;
+        velocity.x = direction.x * physics_speed;
+        velocity.y = direction.y * physics_speed;
         if velocity.length() > 0.0 {
             if state_handler.set(PlayerState::Walk) {
                 sprite_sheet.switch(animation.walk.clone());
