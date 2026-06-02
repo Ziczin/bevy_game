@@ -14,7 +14,7 @@ impl Plugin for RedSlimePlugin {
             .add_systems(Startup, summon::summon)
             .add_systems(Update, (
                 brain::brain,
-                behavior::behavior
+                behavior::behavior,
             ).chain());
     }
 }

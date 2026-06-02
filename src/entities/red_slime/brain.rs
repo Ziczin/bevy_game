@@ -1,37 +1,45 @@
 use bevy::prelude::*;
-use bevy_spritesheet_animation::prelude::*;
+use bevy_spritesheet_animation::prelude::SpritesheetAnimation;
 
-use super::state::{RedSlimeState, RedSlimeAnimation, RedSlimeStateHandler, WALK_DISTANCE_END, WALK_DISTANCE_START};
 use crate::components::markers::Player;
+use crate::components::pathfinding::Pathfinder;
+use super::state::{RedSlimeState, RedSlimeAnimation, RedSlimeStateHandler, WALK_DISTANCE_END, WALK_DISTANCE_START};
 
 pub fn brain(
-    mut slime: Query<(
+    player_query: Query<&Transform, With<Player>>,
+    mut slime_query: Query<(
         &mut RedSlimeStateHandler,
         &mut SpritesheetAnimation,
         &RedSlimeAnimation,
-        &Transform
+        &mut Pathfinder,
+        &Transform,
     )>,
-    player_query: Query<&Transform, With<Player>>,
 ) {
-    let Ok(player) = player_query.single() else { return; };
+    let Ok(player_transform) = player_query.single() else { return; };
 
     for (
         mut state_handler, 
         mut sprite_sheet,
         animation,
-        transform
-    ) in &mut slime {
-        let to_player = player.translation - transform.translation;
-        let distance = to_player.length();
+        mut pathfinder,
+        transform,
+    ) in &mut slime_query {
+        let enemy_pos = transform.translation.xy();
+        let player_pos = player_transform.translation.xy();
+        let distance = enemy_pos.distance(player_pos);
 
-        if WALK_DISTANCE_END < distance && distance <WALK_DISTANCE_START {
+        pathfinder.is_active = distance >= WALK_DISTANCE_END && distance <= WALK_DISTANCE_START;
+
+        if pathfinder.current_target.is_some() {
             if state_handler.set(RedSlimeState::Walk) {
                 sprite_sheet.switch(animation.walk.clone());
             }
-        } else if sprite_sheet.progress.frame == 0 {
-            if state_handler.set(RedSlimeState::Idle) {
-                sprite_sheet.switch(animation.idle.clone());
+        } else {
+            if sprite_sheet.progress.frame == 0 {
+                if state_handler.set(RedSlimeState::Idle) {
+                    sprite_sheet.switch(animation.idle.clone());
+                }
             }
-        };
+        }
     }
 }

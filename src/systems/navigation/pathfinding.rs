@@ -15,18 +15,23 @@ pub fn update_paths(
     let player_pos = player_transform.translation.xy();
 
     for (transform, mut pathfinder) in &mut pathfinder_query {
+        if !pathfinder.is_active {
+            continue;
+        }
+
         pathfinder.update_timer += time.delta_secs();
         
         if pathfinder.update_timer >= pathfinder.update_interval {
             pathfinder.update_timer = 0.0;
-            
             let enemy_pos = transform.translation.xy();
             
             if let Some(new_path) = find_path(&grid, enemy_pos, player_pos) {
                 pathfinder.path = new_path;
                 pathfinder.current_waypoint = 0;
+                pathfinder.current_target = pathfinder.path.first().copied();
             } else {
                 pathfinder.path.clear();
+                pathfinder.current_target = None;
             }
         }
     }

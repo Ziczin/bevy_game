@@ -6,6 +6,8 @@ pub struct Pathfinder {
     pub current_waypoint: usize,
     pub update_timer: f32,
     pub update_interval: f32,
+    pub current_target: Option<Vec2>,
+    pub is_active: bool, 
 }
 
 impl Pathfinder {
@@ -15,6 +17,8 @@ impl Pathfinder {
             current_waypoint: 0,
             update_timer: 0.0,
             update_interval,
+            current_target: None,
+            is_active: false,
         }
     }
 }

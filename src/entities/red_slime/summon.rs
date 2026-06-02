@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 
 use crate::components::core::{DepthLayer, GameLayer};
+use crate::components::pathfinding::Pathfinder;
 use crate::core::extensions::EntityBuilderExt;
 use crate::core::make_spritesheet;
 use super::state::{RedSlimeAnimation, RedSlimeStateHandler};
