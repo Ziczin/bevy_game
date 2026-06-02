@@ -1,10 +1,6 @@
 use bevy::prelude::*;
-use avian2d::prelude::*;
-use crate::components::markers::DepthOrderedDraw;
-#[allow(unused_imports)]
-use bevy_spritesheet_animation::prelude::*;
-
-use crate::core::make_spritesheet;
+use crate::components::core::DepthLayer;
+use crate::core::extensions::EntityBuilderExt;
 
 const TILE_SIZE: f32 = 64.0;
 const GRID_WIDTH: usize = 24;
@@ -21,47 +17,21 @@ pub fn spawn_tiles(asset_server: Res<AssetServer>, mut commands: Commands) {
 
     for y in 0..GRID_HEIGHT {
         for x in 0..GRID_WIDTH {
+            println!("{}:{}", ((x as f32 * TILE_SIZE - offset_x) as i32), ((y as f32 * TILE_SIZE - offset_y) as i32));
             commands.spawn((
                 Sprite {
                     image: tile_tex.clone(),
                     custom_size: Some(Vec2::splat(TILE_SIZE)),
                     ..default()
                 },
-                Transform::from_xyz(
-                    x as f32 * TILE_SIZE - offset_x,
-                    y as f32 * TILE_SIZE - offset_y,
-                    -10.0,
-                ),
                 Tile,
-            ));
+            ))
+            .at(
+                (x as f32 * TILE_SIZE - offset_x) as i32, 
+                (y as f32 * TILE_SIZE - offset_y) as i32, 
+                DepthLayer::Ground(0)
+            );
         }
     }
 }
 
-pub fn spawn_fences(
-    asset_server: Res<AssetServer>,
-    mut commands: Commands,
-    mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-) {
-    #[allow(unused_variables)]
-    let (spritesheet, mut sprite) = make_spritesheet(
-        &asset_server, &mut atlas_layouts,
-        "textures/ground/fence_map.png",
-        4, 4, 64, 64, 64.0, 64.0
-    );
-
-    sprite.texture_atlas.as_mut().unwrap().index = 15;
-
-    commands.spawn((
-        sprite,
-        DepthOrderedDraw,
-        Transform::from_xyz(64.0, 64.0, 1.0),
-        RigidBody::Static,
-    ))
-    .with_children(|children| {
-        children.spawn((
-            Collider::rectangle(64.0, 4.0),
-            Transform::from_xyz(0.0, -28.0, 0.0),
-        ));
-    });
-}

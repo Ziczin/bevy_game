@@ -32,7 +32,7 @@ fn main() {
         ))
         .add_systems(Startup, (
             systems::setup::ground::spawn_tiles,
-            systems::setup::ground::spawn_fences,
+            systems::setup::fence::spawn_fences,
         ))
         .add_systems(Update, (
             systems::movement::lerp_follow::lerp_follow_to_player,

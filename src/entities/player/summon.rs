@@ -1,11 +1,15 @@
 use bevy::prelude::*;
-use avian2d::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
-
-use crate::components::markers::DepthOrderedDraw;
-use crate::core::make_spritesheet;
-use crate::components::behavior::FollowPlayer;
-use crate::components::markers::Player;
+use crate::components::core::GameLayer;
+use crate::core::{
+    make_spritesheet,
+    extensions::EntityBuilderExt,
+};
+use crate::components::{
+    markers::Player,
+    behavior::FollowPlayer,
+    core::DepthLayer,
+};
 
 use super::state::{PlayerAnimation, PlayerStateHandler};
 use super::animation::{create_idle_animation, create_walk_animation};
@@ -33,25 +37,17 @@ pub fn summon(
 
     commands.spawn((
         sprite,
-        //View
         SpritesheetAnimation::new(idle_handler.clone()),
-        PlayerAnimation {
-            idle: idle_handler,
-            walk: walk_handler,
-        },
-        DepthOrderedDraw,
-        //Phy
-        Transform::from_xyz(0.0, 0.0, 0.0),
-        RigidBody::Dynamic,
-        LockedAxes::ROTATION_LOCKED,
-        //Beh
+        PlayerAnimation { idle: idle_handler, walk: walk_handler },
         PlayerStateHandler::default(),
         Player,
     ))
-    .with_children(|children| {
-        children.spawn((
-            Collider::rectangle(32.0, 4.0),
-            Transform::from_xyz(0.0, -28.0, 0.0),
-        ));
-    });
+    .at(0, 0, DepthLayer::Entities(0))
+    .as_dynamic_body()
+    .use_depth_ordered_draw()
+    .with_collider(
+        32, 24, 0, -16,
+        GameLayer::DynamicBody,
+        [GameLayer::World, GameLayer::DynamicBody],
+    );
 }
