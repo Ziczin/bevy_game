@@ -35,7 +35,7 @@ macro_rules! define_depth_layers {
         }
     };
 }
-
+// [-1000 .. +1000]
 define_depth_layers! {
     AlwaysBottom: -800.0,
     Background: -600.0,

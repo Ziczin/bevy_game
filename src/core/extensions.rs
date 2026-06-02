@@ -1,12 +1,13 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
-use crate::components::{core::DepthLayer, markers::DepthOrderedDraw};
+use crate::components::{core::DepthLayer, markers::{DepthOrderedDraw, DepthOrderedDrawOnce}};
 
 pub trait EntityBuilderExt {
     fn at(self, x: i32, y: i32, layer: DepthLayer) -> Self;
     fn as_dynamic_body(self) -> Self;
     fn as_static_body(self) -> Self;
     fn use_depth_ordered_draw(self) -> Self;
+    fn use_depth_ordered_draw_once(self) -> Self;
     
     fn with_collider(
         self, 
@@ -40,6 +41,11 @@ impl EntityBuilderExt for EntityCommands<'_> {
 
     fn use_depth_ordered_draw(mut self) -> Self {
         self.insert(DepthOrderedDraw);
+        return self;
+    }
+
+    fn use_depth_ordered_draw_once(mut self) -> Self {
+        self.insert(DepthOrderedDrawOnce);
         return self;
     }
 

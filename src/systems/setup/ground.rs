@@ -1,13 +1,11 @@
 use bevy::prelude::*;
+use crate::components::markers::Tile;
 use crate::components::core::DepthLayer;
 use crate::core::extensions::EntityBuilderExt;
 
 const TILE_SIZE: f32 = 64.0;
 const GRID_WIDTH: usize = 24;
 const GRID_HEIGHT: usize = 18;
-
-#[derive(Component)]
-pub struct Tile;
 
 pub fn spawn_tiles(asset_server: Res<AssetServer>, mut commands: Commands) {
     let tile_tex = asset_server.load("textures/ground/tile.png");

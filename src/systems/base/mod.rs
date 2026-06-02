@@ -7,6 +7,7 @@ pub struct BaseSystemsPlugin;
 impl Plugin for BaseSystemsPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(Update, depth_ordered_draw::depth_ordered_draw);
+            .add_systems(Update, depth_ordered_draw::depth_ordered_draw)
+            .add_systems(PostStartup, depth_ordered_draw::depth_ordered_draw_once);
     }
 }
