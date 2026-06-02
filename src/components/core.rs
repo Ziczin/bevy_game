@@ -7,6 +7,7 @@ pub enum GameLayer {
     World,
     DynamicBody,
     Projectile,
+    VisionBlock,
 }
 
 macro_rules! define_depth_layers {

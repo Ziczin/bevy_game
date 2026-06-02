@@ -28,6 +28,7 @@ pub fn summon(
         SpritesheetAnimation::new(idle_handler.clone()),
         RedSlimeAnimation { idle: idle_handler, walk: walk_handler, },
         RedSlimeStateHandler::default(),
+        Pathfinder::new(0.5),
     ))
     .at(200, 0, DepthLayer::Entities(0))
     .as_dynamic_body()

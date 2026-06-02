@@ -39,12 +39,12 @@ pub fn spawn_fences(
         sprite.texture_atlas.as_mut().unwrap().index = fence.variant;
 
         commands.spawn((sprite, Tile))
-            .at(fence.x*64, fence.y*64, DepthLayer::Environment(0))
+            .at(fence.x*64, fence.y*64, DepthLayer::Entities(0))
             .as_static_body()
             .use_depth_ordered_draw_once()
             .with_collider(
-                60, 4, -4, -28,
-                GameLayer::World,
+                56, 4, 0, -24,
+                [GameLayer::World, GameLayer::VisionBlock],
                 [GameLayer::DynamicBody, GameLayer::Projectile],
             );
     }

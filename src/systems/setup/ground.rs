@@ -15,7 +15,6 @@ pub fn spawn_tiles(asset_server: Res<AssetServer>, mut commands: Commands) {
 
     for y in 0..GRID_HEIGHT {
         for x in 0..GRID_WIDTH {
-            println!("{}:{}", ((x as f32 * TILE_SIZE - offset_x) as i32), ((y as f32 * TILE_SIZE - offset_y) as i32));
             commands.spawn((
                 Sprite {
                     image: tile_tex.clone(),

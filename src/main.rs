@@ -33,9 +33,13 @@ fn main() {
         .add_systems(Startup, (
             systems::setup::ground::spawn_tiles,
             systems::setup::fence::spawn_fences,
+            systems::navigation::nav_grid::build_initial_nav_grid,
+            
         ))
         .add_systems(Update, (
             systems::movement::lerp_follow::lerp_follow_to_player,
+            systems::navigation::nav_grid::update_nav_grid_position,
+            systems::navigation::pathfinding::update_paths,
         ))
         .run();
 }
