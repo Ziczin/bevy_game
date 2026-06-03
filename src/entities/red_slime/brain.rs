@@ -30,7 +30,7 @@ pub fn brain(
 
         pathfinder.is_active = distance >= WALK_DISTANCE_END && distance <= WALK_DISTANCE_START;
 
-        if pathfinder.current_target.is_some() {
+        if pathfinder.current_target.is_some() && pathfinder.is_active{
             if state_handler.set(RedSlimeState::Walk) {
                 sprite_sheet.switch(animation.walk.clone());
             }

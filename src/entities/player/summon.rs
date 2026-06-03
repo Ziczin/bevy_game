@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
+
 use crate::components::core::GameLayer;
 use crate::core::{
     make_spritesheet,
@@ -10,6 +11,7 @@ use crate::components::{
     behavior::FollowPlayer,
     core::DepthLayer,
 };
+use crate::core::debug_log::DebugLogBuffer;
 
 use super::state::{PlayerAnimation, PlayerStateHandler};
 use super::animation::{create_idle_animation, create_walk_animation};
@@ -19,7 +21,9 @@ pub fn summon(
     mut commands: Commands,
     mut animations: ResMut<Assets<Animation>>,
     mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    mut debug_log: ResMut<DebugLogBuffer>,
 ) {
+    debug_log.add("🎬 Player summon started");
     //Camera
     commands.spawn((
         Camera2d, 
@@ -45,9 +49,11 @@ pub fn summon(
     .at(0, 0, DepthLayer::Entities(0))
     .as_dynamic_body()
     .use_depth_ordered_draw()
-    .with_collider(
-        32, 24, 0, -16,
+    .with_oval_collider(
+        16, 14,
+        0, -16,
         GameLayer::DynamicBody,
         [GameLayer::World, GameLayer::DynamicBody],
     );
+    debug_log.add("✅ Player spawned");
 }

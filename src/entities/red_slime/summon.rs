@@ -1,21 +1,66 @@
 use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
+use avian2d::prelude::*;
 
 use crate::components::core::{DepthLayer, GameLayer};
 use crate::components::pathfinding::Pathfinder;
 use crate::core::extensions::EntityBuilderExt;
 use crate::core::make_spritesheet;
-use super::state::{RedSlimeAnimation, RedSlimeStateHandler};
+use crate::core::debug_log::DebugLogBuffer;
+use super::state::{RedSlimeAnimation, RedSlimeStateHandler, WALK_DISTANCE_END};
 use super::animation::{create_idle_animation, create_walk_animation};
+
+pub fn spawn_single_red_slime(
+    commands: &mut Commands,
+    x: i32,
+    y: i32,
+    sprite_template: &Sprite,
+    idle_anim: Handle<Animation>,
+    walk_anim: Handle<Animation>,
+    debug_log: &mut DebugLogBuffer,
+    size: i32,
+) {
+    let mut sprite = sprite_template.clone();
+    let width = size * 8;
+    let height = size * 7;
+
+    let agent_half_size = Vec2::new(width as f32 + 2.0, height as f32 + 2.0);
+    
+    let entity = commands.spawn((
+        sprite,
+        SpritesheetAnimation::new(idle_anim.clone()),
+        RedSlimeAnimation { 
+            idle: idle_anim, 
+            walk: walk_anim, 
+        },
+        RedSlimeStateHandler::default(),
+        Pathfinder::new(0.5, agent_half_size, WALK_DISTANCE_END),
+        LinearVelocity::default(),
+    ))
+    .at(x, y, DepthLayer::Entities(0))
+    .as_dynamic_body()
+    .use_depth_ordered_draw()
+    .with_oval_collider(
+        width, height,
+        0, -8,
+        GameLayer::DynamicBody,
+        [GameLayer::World, GameLayer::DynamicBody],
+    )
+    .id();
+
+    debug_log.add(format!("✅ RedSlime spawned at ({}, {}) with entity ID: {:?}", x, y, entity));
+}
 
 pub fn summon(
     asset_server: Res<AssetServer>,
     mut commands: Commands,
     mut animations: ResMut<Assets<Animation>>,
     mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    mut debug_log: ResMut<DebugLogBuffer>,
 ) {
+    debug_log.add("🎬 RedSlime summon started");
 
-    let (spritesheet, sprite) = make_spritesheet(
+    let (spritesheet, sprite_template) = make_spritesheet(
         &asset_server, &mut atlas_layouts,
         "textures/red_slime/map.png",
         8, 1, 128, 16, 64.0, 64.0
@@ -24,19 +69,45 @@ pub fn summon(
     let idle_handler = create_idle_animation(&spritesheet, &mut animations);
     let walk_handler = create_walk_animation(&spritesheet, &mut animations);
 
-    commands.spawn((
-        sprite,
-        SpritesheetAnimation::new(idle_handler.clone()),
-        RedSlimeAnimation { idle: idle_handler, walk: walk_handler, },
-        RedSlimeStateHandler::default(),
-        Pathfinder::new(0.5),
-    ))
-    .at(200, 0, DepthLayer::Entities(0))
-    .as_dynamic_body()
-    .use_depth_ordered_draw()
-    .with_collider(
-        32, 24, 0, -16,
-        GameLayer::DynamicBody,
-        [GameLayer::World, GameLayer::DynamicBody],
+    spawn_single_red_slime(
+        &mut commands,
+        200, 0,
+        &sprite_template,
+        idle_handler.clone(),
+        walk_handler.clone(),
+        &mut debug_log,
+        2
     );
+
+    spawn_single_red_slime(
+        &mut commands,
+        -200, 100,
+        &sprite_template,
+        idle_handler.clone(),
+        walk_handler.clone(),
+        &mut debug_log,
+        3
+    );
+
+    spawn_single_red_slime(
+        &mut commands,
+        0, -150,
+        &sprite_template,
+        idle_handler.clone(),
+        walk_handler.clone(),
+        &mut debug_log,
+        4
+    );
+
+    spawn_single_red_slime(
+        &mut commands,
+        0, -250,
+        &sprite_template,
+        idle_handler.clone(),
+        walk_handler.clone(),
+        &mut debug_log,
+        5
+    );
+
+    debug_log.add("✅ All RedSlimes spawned successfully");
 }

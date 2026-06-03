@@ -7,11 +7,13 @@ pub struct Pathfinder {
     pub update_timer: f32,
     pub update_interval: f32,
     pub current_target: Option<Vec2>,
-    pub is_active: bool, 
+    pub is_active: bool,
+    pub agent_half_size: Vec2,
+    pub arrival_threshold: f32,
 }
 
 impl Pathfinder {
-    pub fn new(update_interval: f32) -> Self {
+    pub fn new(update_interval: f32, agent_half_size: Vec2, arrival_threshold: f32) -> Self {
         Self {
             path: Vec::new(),
             current_waypoint: 0,
@@ -19,6 +21,8 @@ impl Pathfinder {
             update_interval,
             current_target: None,
             is_active: false,
+            agent_half_size,
+            arrival_threshold,
         }
     }
 }

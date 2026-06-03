@@ -24,14 +24,14 @@ pub fn spawn_fences(
     );
 
     let fences_to_spawn = vec![
-        FenceSegment { x: 1, y: 1, variant: 1 },
-        FenceSegment { x: 2, y: 1, variant: 5 },
-        FenceSegment { x: 3, y: 1, variant: 10 },
-        FenceSegment { x: 4, y: 1, variant: 15 },
-        FenceSegment { x: 2, y: 3, variant: 2 },
-        FenceSegment { x: 3, y: 3, variant: 11 },
-        FenceSegment { x: 4, y: 3, variant: 14 },
-        FenceSegment { x: 5, y: 3, variant: 3 },
+        FenceSegment { x: -6, y: 1, variant: 1 },
+        FenceSegment { x: -5, y: 1, variant: 5 },
+        FenceSegment { x: -4, y: 1, variant: 10 },
+        FenceSegment { x: -3, y: 1, variant: 15 },
+        FenceSegment { x: -1, y: 1, variant: 2 },
+        FenceSegment { x: 0, y: 1, variant: 11 },
+        FenceSegment { x: 1, y: 1, variant: 14 },
+        FenceSegment { x: 2, y: 1, variant: 3 },
     ];
 
     for fence in fences_to_spawn {
@@ -42,7 +42,7 @@ pub fn spawn_fences(
             .at(fence.x*64, fence.y*64, DepthLayer::Entities(0))
             .as_static_body()
             .use_depth_ordered_draw_once()
-            .with_collider(
+            .with_rect_collider(
                 56, 4, 0, -24,
                 [GameLayer::World, GameLayer::VisionBlock],
                 [GameLayer::DynamicBody, GameLayer::Projectile],

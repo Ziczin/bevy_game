@@ -9,13 +9,23 @@ pub trait EntityBuilderExt {
     fn use_depth_ordered_draw(self) -> Self;
     fn use_depth_ordered_draw_once(self) -> Self;
     
-    fn with_collider(
+    fn with_rect_collider(
         self, 
         w: i32, 
         h: i32, 
         x: i32, 
         y: i32, 
         layers: impl Into<LayerMask>, 
+        filters: impl Into<LayerMask>
+    ) -> Self;
+
+    fn with_oval_collider(
+        self,
+        half_width: i32,
+        half_height: i32,
+        x: i32,
+        y: i32,
+        layers: impl Into<LayerMask>,
         filters: impl Into<LayerMask>
     ) -> Self;
 }
@@ -30,7 +40,11 @@ impl EntityBuilderExt for EntityCommands<'_> {
     }
 
     fn as_dynamic_body(mut self) -> Self {
-        self.insert((RigidBody::Dynamic, LockedAxes::ROTATION_LOCKED));
+        self.insert((
+            RigidBody::Dynamic, 
+            LockedAxes::ROTATION_LOCKED,
+            LinearVelocity::default(),
+        ));
         return self;
     }
 
@@ -49,7 +63,7 @@ impl EntityBuilderExt for EntityCommands<'_> {
         return self;
     }
 
-    fn with_collider(
+    fn with_rect_collider(
         mut self, 
         w: i32, 
         h: i32, 
@@ -61,6 +75,25 @@ impl EntityBuilderExt for EntityCommands<'_> {
         self.with_children(|children| {
             children.spawn((
                 Collider::rectangle(w as f32, h as f32),
+                Transform::from_xyz(x as f32, y as f32, 0.0),
+                CollisionLayers::new(layers, filters),
+            ));
+        });
+        return self;
+    }
+
+    fn with_oval_collider(
+        mut self,
+        half_width: i32,
+        half_height: i32,
+        x: i32,
+        y: i32,
+        layers: impl Into<LayerMask>,
+        filters: impl Into<LayerMask>
+    ) -> Self {
+        self.with_children(|children| {
+            children.spawn((
+                Collider::ellipse(half_width as f32, half_height as f32),
                 Transform::from_xyz(x as f32, y as f32, 0.0),
                 CollisionLayers::new(layers, filters),
             ));
