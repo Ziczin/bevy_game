@@ -3,7 +3,7 @@ use avian2d::prelude::*;
 
 use crate::components::pathfinding::Pathfinder;
 use crate::core::debug_log::DebugLogBuffer;
-use super::state::{RedSlimeStateHandler, RedSlimeState, WALK_SPEED};
+use super::state::{RedSlimeStateHandler, RedSlimeState, WALK_SPEED, WAYPOINT_ARRIVAL_THRESHOLD};
 
 /// Получает мировую позицию коллайдера агента
 fn get_collider_world_position(
@@ -13,11 +13,9 @@ fn get_collider_world_position(
 ) -> Vec2 {
     for child in children.iter() {
         if let Ok((child_transform, Some(_collider))) = child_query.get(child) {
-            // Складываем локальную позицию ребёнка с мировой позицией родителя
             return transform.translation.xy() + child_transform.translation.xy();
         }
     }
-    // Если коллайдер не найден, возвращаем позицию родителя
     transform.translation.xy()
 }
 
@@ -38,7 +36,6 @@ pub fn behavior(
     for (entity, mut velocity, state_handler, mut pathfinder, transform, children) in &mut slime_query {
         count += 1;
         
-        // Получаем позицию коллайдера (физический центр агента)
         let collider_pos = get_collider_world_position(transform, children, &child_query);
 
         match state_handler.get() {
@@ -51,7 +48,7 @@ pub fn behavior(
                     let to_target = target - collider_pos;
                     let distance_to_target = to_target.length();
 
-                    if distance_to_target < 16.0 {
+                    if distance_to_target < WAYPOINT_ARRIVAL_THRESHOLD {
                         pathfinder.current_waypoint += 1;
                         if pathfinder.current_waypoint < pathfinder.path.len() {
                             pathfinder.current_target = Some(pathfinder.path[pathfinder.current_waypoint]);

@@ -23,6 +23,7 @@ fn main() {
             DefaultPlugins.set(ImagePlugin::default_nearest()),
             SpritesheetAnimationPlugin,
             core::navigation::NavigationPlugin,
+            entities::Playground,
         ))
         .insert_resource(Gravity::ZERO)
         .insert_resource(core::navigation::NavigationVisualSettings { enabled: DEBUG_NAVMESH })
@@ -42,10 +43,6 @@ fn main() {
         .add_plugins((
             entities::RedSlime,
             entities::Player,
-        ))
-        .add_systems(Startup, (
-            systems::setup::ground::spawn_tiles,
-            systems::setup::fence::spawn_fences,
         ))
         .add_systems(Update, (
             systems::movement::lerp_follow::lerp_follow_to_player,

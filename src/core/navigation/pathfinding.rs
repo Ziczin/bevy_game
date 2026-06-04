@@ -6,6 +6,7 @@ use crate::components::pathfinding::Pathfinder;
 use crate::core::debug_log::DebugLogBuffer;
 use super::nav_grid::NavGrid;
 use super::astar::find_path;
+use super::state::{COLLIDER_MIN_SIZE, ELLIPSE_THRESHOLD};
 
 fn get_collider_world_position(
     transform: &Transform,
@@ -20,36 +21,44 @@ fn get_collider_world_position(
     transform.translation.xy()
 }
 
-/// Вычисляет все клетки, которые занимает агент с учётом его размера
 fn get_occupied_cells(
     grid: &NavGrid,
-    collider_pos: Vec2,
-    agent_half_size: Vec2,
+    other_pos: Vec2,
+    other_half_size: Vec2,
+    current_half_size: Vec2,
 ) -> HashSet<(usize, usize)> {
     let mut cells = HashSet::new();
-    
-    // Вычисляем границы прямоугольника вокруг агента
-    let min_x = collider_pos.x - agent_half_size.x;
-    let max_x = collider_pos.x + agent_half_size.x;
-    let min_y = collider_pos.y - agent_half_size.y;
-    let max_y = collider_pos.y + agent_half_size.y;
-    
-    // Преобразуем в координаты сетки
-    if let Some((min_grid_x, _)) = grid.world_to_grid(Vec2::new(min_x, collider_pos.y)) {
-        if let Some((max_grid_x, _)) = grid.world_to_grid(Vec2::new(max_x, collider_pos.y)) {
-            if let Some((_, min_grid_y)) = grid.world_to_grid(Vec2::new(collider_pos.x, min_y)) {
-                if let Some((_, max_grid_y)) = grid.world_to_grid(Vec2::new(collider_pos.x, max_y)) {
-                    // Добавляем все клетки в прямоугольнике
-                    for x in min_grid_x..=max_grid_x {
-                        for y in min_grid_y..=max_grid_y {
-                            cells.insert((x, y));
-                        }
-                    }
-                }
+
+    let rx = (other_half_size.x + current_half_size.x).max(COLLIDER_MIN_SIZE);
+    let ry = (other_half_size.y + current_half_size.y).max(COLLIDER_MIN_SIZE);
+
+    let Some((agent_gx, agent_gy)) = grid.world_to_grid(other_pos) else {
+        return cells;
+    };
+
+    let cells_rx = (rx / grid.cell_size).ceil() as isize + 1;
+    let cells_ry = (ry / grid.cell_size).ceil() as isize + 1;
+
+    for dx in -cells_rx..=cells_rx {
+        for dy in -cells_ry..=cells_ry {
+            let gx = (agent_gx as isize + dx) as usize;
+            let gy = (agent_gy as isize + dy) as usize;
+
+            if gx >= grid.width || gy >= grid.height {
+                continue;
+            }
+
+            let cell_center = grid.grid_to_world(gx, gy);
+
+            let norm_x = (cell_center.x - other_pos.x) / rx;
+            let norm_y = (cell_center.y - other_pos.y) / ry;
+
+            if norm_x * norm_x + norm_y * norm_y <= ELLIPSE_THRESHOLD {
+                cells.insert((gx, gy));
             }
         }
     }
-    
+
     cells
 }
 
@@ -72,17 +81,11 @@ pub fn update_paths(
     };
     let player_pos = player_transform.translation.xy();
 
-    // Собираем занятые клетки от всех агентов с учётом их размеров
-    let mut all_occupied_cells = HashSet::new();
-    let mut agent_positions: Vec<(Entity, Vec2)> = Vec::new();
+    let mut agent_data: Vec<(Entity, Vec2, Vec2)> = Vec::new();
     
     for (entity, transform, children, pathfinder) in &pathfinder_query {
         let collider_pos = get_collider_world_position(transform, children, &child_query);
-        agent_positions.push((entity, collider_pos));
-        
-        // Получаем все клетки, которые занимает этот агент
-        let occupied = get_occupied_cells(&grid, collider_pos, pathfinder.agent_half_size);
-        all_occupied_cells.extend(occupied);
+        agent_data.push((entity, collider_pos, pathfinder.agent_half_size));
     }
 
     let mut count = 0;
@@ -113,11 +116,20 @@ pub fn update_paths(
             
             debug_log.add(format!("🧠 Slime {:?}: Attempting to find path", entity));
             
-            // Создаём копию occupied_cells без клеток текущего агента
-            let mut occupied_without_self = all_occupied_cells.clone();
-            let self_occupied = get_occupied_cells(&grid, collider_pos, pathfinder.agent_half_size);
-            for cell in self_occupied {
-                occupied_without_self.remove(&cell);
+            let mut occupied_without_self = HashSet::new();
+            
+            for (other_entity, other_pos, other_half_size) in &agent_data {
+                if *other_entity == entity {
+                    continue;
+                }
+                
+                let occupied = get_occupied_cells(
+                    &grid, 
+                    *other_pos, 
+                    *other_half_size, 
+                    pathfinder.agent_half_size
+                );
+                occupied_without_self.extend(occupied);
             }
             
             if let Some(new_path) = find_path(&grid, collider_pos, player_pos, &spatial_query, pathfinder.agent_half_size, pathfinder.arrival_threshold, &occupied_without_self) {

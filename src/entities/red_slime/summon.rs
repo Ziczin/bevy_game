@@ -7,7 +7,11 @@ use crate::components::pathfinding::Pathfinder;
 use crate::core::extensions::EntityBuilderExt;
 use crate::core::make_spritesheet;
 use crate::core::debug_log::DebugLogBuffer;
-use super::state::{RedSlimeAnimation, RedSlimeStateHandler, WALK_DISTANCE_END};
+use super::state::{
+    RedSlimeAnimation, RedSlimeStateHandler, WALK_DISTANCE_END,
+    PATHFINDER_UPDATE_INTERVAL, SPRITE_SIZE_MULTIPLIER_X, SPRITE_SIZE_MULTIPLIER_Y,
+    COLLIDER_PADDING, COLLIDER_OFFSET_X, COLLIDER_OFFSET_Y,
+};
 use super::animation::{create_idle_animation, create_walk_animation};
 
 pub fn spawn_single_red_slime(
@@ -20,11 +24,12 @@ pub fn spawn_single_red_slime(
     debug_log: &mut DebugLogBuffer,
     size: i32,
 ) {
-    let mut sprite = sprite_template.clone();
-    let width = size * 8;
-    let height = size * 7;
+    let sprite = sprite_template.clone();
+    
+    let width = size * SPRITE_SIZE_MULTIPLIER_X;
+    let height = size * SPRITE_SIZE_MULTIPLIER_Y;
 
-    let agent_half_size = Vec2::new(width as f32 + 2.0, height as f32 + 2.0);
+    let agent_half_size = Vec2::new(width as f32 + COLLIDER_PADDING, height as f32 + COLLIDER_PADDING);
     
     let entity = commands.spawn((
         sprite,
@@ -34,7 +39,7 @@ pub fn spawn_single_red_slime(
             walk: walk_anim, 
         },
         RedSlimeStateHandler::default(),
-        Pathfinder::new(0.5, agent_half_size, WALK_DISTANCE_END),
+        Pathfinder::new(PATHFINDER_UPDATE_INTERVAL, agent_half_size, WALK_DISTANCE_END),
         LinearVelocity::default(),
     ))
     .at(x, y, DepthLayer::Entities(0))
@@ -42,7 +47,7 @@ pub fn spawn_single_red_slime(
     .use_depth_ordered_draw()
     .with_oval_collider(
         width, height,
-        0, -8,
+        COLLIDER_OFFSET_X, COLLIDER_OFFSET_Y,
         GameLayer::DynamicBody,
         [GameLayer::World, GameLayer::DynamicBody],
     )
@@ -62,7 +67,7 @@ pub fn summon(
 
     let (spritesheet, sprite_template) = make_spritesheet(
         &asset_server, &mut atlas_layouts,
-        "textures/red_slime/map.png",
+        "textures/red_slime/red_slime_tilemap.png",
         8, 1, 128, 16, 64.0, 64.0
     );
 

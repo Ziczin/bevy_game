@@ -1,6 +1,12 @@
 use crate::macros::{animation_states, behavior_states};
 
-behavior_states!(Player { Idle, Walk });
-animation_states!(Player { idle, walk } );
-
 pub const MOVING_SPEED: f32 = 200.0;
+pub const CAMERA_FOLLOW_SMOOTHNESS: f32 = 0.99;
+
+pub const PLAYER_COLLIDER_HALF_WIDTH: i32 = 16;
+pub const PLAYER_COLLIDER_HALF_HEIGHT: i32 = 14;
+pub const PLAYER_COLLIDER_OFFSET_X: i32 = 0;
+pub const PLAYER_COLLIDER_OFFSET_Y: i32 = -16;
+
+behavior_states!(Player { Idle, Walk });
+animation_states!(Player { idle, walk });

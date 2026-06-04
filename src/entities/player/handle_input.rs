@@ -3,7 +3,6 @@ use avian2d::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 
 use crate::components::markers::Player;
-
 use super::state::{MOVING_SPEED, PlayerStateHandler, PlayerState, PlayerAnimation};
 
 pub fn handle_input(
@@ -15,7 +14,6 @@ pub fn handle_input(
         &PlayerAnimation,
     ), With<Player>>,
 ) {
-
     let mut direction = Vec2::ZERO;
     if keyboard.pressed(KeyCode::ArrowLeft)  { direction.x -= 1.0; }
     if keyboard.pressed(KeyCode::ArrowRight) { direction.x += 1.0; }
@@ -27,15 +25,14 @@ pub fn handle_input(
     }
 
     for (mut velocity, mut sprite_sheet, mut state_handler, animation) in &mut player {
-        let physics_speed = MOVING_SPEED;
-        velocity.x = direction.x * physics_speed;
-        velocity.y = direction.y * physics_speed;
+        velocity.x = direction.x * MOVING_SPEED;
+        velocity.y = direction.y * MOVING_SPEED;
+        
         if velocity.length() > 0.0 {
             if state_handler.set(PlayerState::Walk) {
                 sprite_sheet.switch(animation.walk.clone());
             }
-        }
-        else if sprite_sheet.progress.frame == 0 {
+        } else if sprite_sheet.progress.frame == 0 {
             if state_handler.set(PlayerState::Idle) {
                 sprite_sheet.switch(animation.idle.clone());
             }

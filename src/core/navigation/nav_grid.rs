@@ -1,28 +1,27 @@
 use bevy::prelude::*;
 
-#[derive(Clone, Copy, Debug, Default)]
-pub struct CellData {
-    pub walkable: bool,
-    pub blocks_vision: bool,
-}
-
 #[derive(Resource)]
 pub struct NavGrid {
     pub cell_size: f32,
     pub width: usize,
     pub height: usize,
     pub origin: Vec2,
-    pub cells: Vec<CellData>,
+    // SoA (Structure of Arrays): разделяем данные для максимальной кэш-локальности
+    pub walkable: Vec<bool>,
+    pub blocks_vision: Vec<bool>,
 }
 
 impl NavGrid {
     pub fn new(cell_size: f32, width: usize, height: usize, origin: Vec2) -> Self {
+        let len = width * height;
         Self {
             cell_size,
             width,
             height,
             origin,
-            cells: vec![CellData::default(); width * height],
+            // Инициализируем двумя непрерывными массивами
+            walkable: vec![false; len],
+            blocks_vision: vec![false; len],
         }
     }
 
@@ -49,16 +48,21 @@ impl NavGrid {
         );
     }
 
-    pub fn get_cell(&self, x: usize, y: usize) -> Option<CellData> {
+    /// Возвращает кортеж (walkable, blocks_vision)
+    pub fn get_cell(&self, x: usize, y: usize) -> Option<(bool, bool)> {
         if x < self.width && y < self.height {
-            return Some(self.cells[y * self.width + x]);
+            let idx = y * self.width + x;
+            Some((self.walkable[idx], self.blocks_vision[idx]))
+        } else {
+            None
         }
-        return None;
     }
 
     pub fn set_cell(&mut self, x: usize, y: usize, walkable: bool, blocks_vision: bool) {
         if x < self.width && y < self.height {
-            self.cells[y * self.width + x] = CellData { walkable, blocks_vision };
+            let idx = y * self.width + x;
+            self.walkable[idx] = walkable;
+            self.blocks_vision[idx] = blocks_vision;
         }
     }
 }

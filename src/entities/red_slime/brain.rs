@@ -3,7 +3,7 @@ use bevy_spritesheet_animation::prelude::SpritesheetAnimation;
 
 use crate::components::markers::Player;
 use crate::components::pathfinding::Pathfinder;
-use super::state::{RedSlimeState, RedSlimeAnimation, RedSlimeStateHandler, WALK_DISTANCE_END, WALK_DISTANCE_START};
+use super::state::{RedSlimeState, RedSlimeAnimation, RedSlimeStateHandler, WALK_DISTANCE_END, WALK_DISTANCE_START, EXPECTED_IDLE_FRAME};
 
 pub fn brain(
     player_query: Query<&Transform, With<Player>>,
@@ -30,12 +30,12 @@ pub fn brain(
 
         pathfinder.is_active = distance >= WALK_DISTANCE_END && distance <= WALK_DISTANCE_START;
 
-        if pathfinder.current_target.is_some() && pathfinder.is_active{
+        if pathfinder.current_target.is_some() && pathfinder.is_active {
             if state_handler.set(RedSlimeState::Walk) {
                 sprite_sheet.switch(animation.walk.clone());
             }
         } else {
-            if sprite_sheet.progress.frame == 0 {
+            if sprite_sheet.progress.frame == EXPECTED_IDLE_FRAME {
                 if state_handler.set(RedSlimeState::Idle) {
                     sprite_sheet.switch(animation.idle.clone());
                 }

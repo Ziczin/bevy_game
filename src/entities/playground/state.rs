@@ -1,0 +1,66 @@
+pub const TILE_SIZE: f32 = 64.0;
+pub const GRID_WIDTH: usize = 24;
+pub const GRID_HEIGHT: usize = 18;
+pub const TILE_TEXTURE_PATH: &str = "textures/ground/tile.png";
+
+pub const FENCE_TEXTURE_PATH: &str = "textures/ground/fence_tilemap.png";
+pub const FENCE_ATLAS_COLS: usize = 4;
+pub const FENCE_ATLAS_ROWS: usize = 4;
+pub const FENCE_IMAGE_WIDTH: u32 = 64;
+pub const FENCE_IMAGE_HEIGHT: u32 = 64;
+pub const FENCE_SPRITE_SIZE_X: f32 = 64.0;
+pub const FENCE_SPRITE_SIZE_Y: f32 = 64.0;
+
+pub const FENCE_COLLIDER_WIDTH: i32 = 56;
+pub const FENCE_COLLIDER_HEIGHT: i32 = 4;
+pub const FENCE_COLLIDER_OFFSET_X: i32 = 0;
+pub const FENCE_COLLIDER_OFFSET_Y: i32 = -24;
+
+pub struct FenceSegment {
+    pub x: i32,
+    pub y: i32,
+    pub variant: usize,
+}
+
+pub const FENCES_TO_SPAWN: [FenceSegment; 8] = [
+    FenceSegment { x: -6, y: 1, variant: 1 },
+    FenceSegment { x: -5, y: 1, variant: 5 },
+    FenceSegment { x: -4, y: 1, variant: 10 },
+    FenceSegment { x: -3, y: 1, variant: 15 },
+    FenceSegment { x: -1, y: 1, variant: 2 },
+    FenceSegment { x: 0, y: 1, variant: 11 },
+    FenceSegment { x: 1, y: 1, variant: 14 },
+    FenceSegment { x: 2, y: 1, variant: 3 },
+];
+
+// === Дорожки (авто-тайлинг по соседству Мура) ===
+pub const PATH_TEXTURE_PATH: &str = "textures/ground/path_tilemap.png";
+pub const PATH_ATLAS_COLS: usize = 12;
+pub const PATH_ATLAS_ROWS: usize = 4;
+pub const PATH_IMAGE_WIDTH: u32 = 196;
+pub const PATH_IMAGE_HEIGHT: u32 = 64;
+pub const PATH_TILE_SIZE: f32 = 16.0;
+
+// Порядок битов в маске Мура (от старшего к младшему):
+// bit 7: NW, bit 6: N, bit 5: NE, bit 4: E,
+// bit 3: SE, bit 2: S, bit 1: SW, bit 0: W
+//
+// map[mask] = sprite_index (0..47), -1 если тайла нет для этой маски.
+pub const PATH_TILE_MAP: [i8; 256] = [
+     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+    32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+    32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+    32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+    32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+    16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+    32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+];

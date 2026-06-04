@@ -1,17 +1,17 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
-use crate::components::core::DepthLayer;
 use crate::components::pathfinding::Pathfinder;
 use super::nav_grid::NavGrid;
-
-#[derive(Component)]
-pub struct NavGridVisualMarker;
-
-#[derive(Component)]
-pub struct NavPathVisualMarker;
-
-#[derive(Component)]
-pub struct AgentCenterVisualMarker;
+use super::state::{
+    NavGridVisualMarker, NavPathVisualMarker, AgentCenterVisualMarker,
+    NAV_GRID_UI_LAYER, NAV_PATH_UI_LAYER, AGENT_CENTER_UI_LAYER,
+    GRID_WALKABLE_COLOR, GRID_BLOCKED_COLOR,
+    PATH_POINT_COLOR, PATH_LINE_COLOR,
+    AGENT_CENTER_COLOR, AGENT_OUTLINE_COLOR,
+    GRID_WALKABLE_SIZE, GRID_BLOCKED_SIZE,
+    PATH_POINT_SIZE, PATH_LINE_THICKNESS,
+    AGENT_CENTER_SIZE, AGENT_OUTLINE_THICKNESS, AGENT_OUTLINE_SEGMENTS,
+};
 
 #[derive(Resource)]
 pub struct NavigationVisualSettings {
@@ -24,7 +24,6 @@ impl Default for NavigationVisualSettings {
     }
 }
 
-/// Получает мировую позицию коллайдера агента
 fn get_collider_world_position(
     transform: &Transform,
     children: &Children,
@@ -54,24 +53,17 @@ pub fn visualize_nav_grid(
         commands.entity(entity).despawn();
     }
 
-    let layer = DepthLayer::Ui(-10);
+    let layer = NAV_GRID_UI_LAYER;
     let z = layer.depth_value();
 
     for y in 0..grid.height {
         for x in 0..grid.width {
-            if let Some(cell) = grid.get_cell(x, y) {
+            if let Some((walkable, _visible)) = grid.get_cell(x, y) {
                 let world_pos = grid.grid_to_world(x, y);
-                let color: Color;
-                let size: f32;
-                if cell.walkable {
-                    color = Color::srgba(0.0, 1.0, 0.0, 0.3);
+                let (color, size) = if walkable {
+                    (GRID_WALKABLE_COLOR, GRID_WALKABLE_SIZE)
                 } else {
-                    color = Color::srgba(1.0, 0.0, 0.0, 0.9);
-                };
-                if cell.walkable {
-                    size = 4.0;
-                } else {
-                    size = 6.0;
+                    (GRID_BLOCKED_COLOR, GRID_BLOCKED_SIZE)
                 };
 
                 commands.spawn((
@@ -103,15 +95,15 @@ pub fn visualize_nav_path(
         commands.entity(entity).despawn();
     }
 
-    let layer = DepthLayer::Ui(-9);
+    let layer = NAV_PATH_UI_LAYER;
     let z = layer.depth_value();
 
     for pathfinder in &pathfinder_query {
         for waypoint in &pathfinder.path {
             commands.spawn((
                 Sprite {
-                    color: Color::srgba(1.0, 1.0, 0.0, 0.8),
-                    custom_size: Some(Vec2::splat(4.0)),
+                    color: PATH_POINT_COLOR,
+                    custom_size: Some(Vec2::splat(PATH_POINT_SIZE)),
                     ..default()
                 },
                 Transform::from_xyz(waypoint.x, waypoint.y, z),
@@ -131,8 +123,8 @@ pub fn visualize_nav_path(
 
                 commands.spawn((
                     Sprite {
-                        color: Color::srgba(1.0, 1.0, 0.0, 0.5),
-                        custom_size: Some(Vec2::new(length, 2.0)),
+                        color: PATH_LINE_COLOR,
+                        custom_size: Some(Vec2::new(length, PATH_LINE_THICKNESS)),
                         ..default()
                     },
                     Transform::from_xyz(mid.x, mid.y, z)
@@ -160,17 +152,16 @@ pub fn visualize_agent_centers(
         commands.entity(entity).despawn();
     }
 
-    let layer = DepthLayer::Ui(-8);
+    let layer = AGENT_CENTER_UI_LAYER;
     let z = layer.depth_value();
 
-    for (entity, transform, children, pathfinder) in &pathfinder_query {
-        // Получаем позицию коллайдера (физический центр агента)
+    for (_entity, transform, children, pathfinder) in &pathfinder_query {
         let center_pos = get_collider_world_position(transform, children, &child_query);
         
         commands.spawn((
             Sprite {
-                color: Color::srgba(0.8, 0.0, 0.8, 1.0),
-                custom_size: Some(Vec2::splat(8.0)),
+                color: AGENT_CENTER_COLOR,
+                custom_size: Some(Vec2::splat(AGENT_CENTER_SIZE)),
                 ..default()
             },
             Transform::from_xyz(center_pos.x, center_pos.y, z),
@@ -179,11 +170,10 @@ pub fn visualize_agent_centers(
         ));
 
         let half_size = pathfinder.agent_half_size;
-        let segments = 16;
         
-        for i in 0..segments {
-            let angle1 = (i as f32 / segments as f32) * std::f32::consts::TAU;
-            let angle2 = ((i + 1) as f32 / segments as f32) * std::f32::consts::TAU;
+        for i in 0..AGENT_OUTLINE_SEGMENTS {
+            let angle1 = (i as f32 / AGENT_OUTLINE_SEGMENTS as f32) * std::f32::consts::TAU;
+            let angle2 = ((i + 1) as f32 / AGENT_OUTLINE_SEGMENTS as f32) * std::f32::consts::TAU;
             
             let x1 = center_pos.x + angle1.cos() * half_size.x;
             let y1 = center_pos.y + angle1.sin() * half_size.y;
@@ -198,8 +188,8 @@ pub fn visualize_agent_centers(
 
             commands.spawn((
                 Sprite {
-                    color: Color::srgba(0.8, 0.0, 0.8, 0.5),
-                    custom_size: Some(Vec2::new(length, 2.0)),
+                    color: AGENT_OUTLINE_COLOR,
+                    custom_size: Some(Vec2::new(length, AGENT_OUTLINE_THICKNESS)),
                     ..default()
                 },
                 Transform::from_xyz(mid.x, mid.y, z)
