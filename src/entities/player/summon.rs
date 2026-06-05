@@ -31,7 +31,7 @@ pub fn summon(
     let (spritesheet, sprite) = make_spritesheet(
         &asset_server, &mut atlas_layouts,
         "textures/player/player_tilemap.png",
-        8, 1, 128, 16, 64.0, 64.0
+        8, 1, 128, 16, 16.0, 16.0
     );
 
     let idle_handler = create_idle_animation(&spritesheet, &mut animations);

@@ -68,7 +68,7 @@ pub fn summon(
     let (spritesheet, sprite_template) = make_spritesheet(
         &asset_server, &mut atlas_layouts,
         "textures/red_slime/red_slime_tilemap.png",
-        8, 1, 128, 16, 64.0, 64.0
+        8, 1, 128, 16, 16.0, 16.0
     );
 
     let idle_handler = create_idle_animation(&spritesheet, &mut animations);
@@ -76,7 +76,17 @@ pub fn summon(
 
     spawn_single_red_slime(
         &mut commands,
-        200, 0,
+        50, 0,
+        &sprite_template,
+        idle_handler.clone(),
+        walk_handler.clone(),
+        &mut debug_log,
+        1
+    );
+
+    spawn_single_red_slime(
+        &mut commands,
+        -50, 25,
         &sprite_template,
         idle_handler.clone(),
         walk_handler.clone(),
@@ -86,7 +96,7 @@ pub fn summon(
 
     spawn_single_red_slime(
         &mut commands,
-        -200, 100,
+        0, -38,
         &sprite_template,
         idle_handler.clone(),
         walk_handler.clone(),
@@ -96,22 +106,12 @@ pub fn summon(
 
     spawn_single_red_slime(
         &mut commands,
-        0, -150,
+        0, -62,
         &sprite_template,
         idle_handler.clone(),
         walk_handler.clone(),
         &mut debug_log,
         4
-    );
-
-    spawn_single_red_slime(
-        &mut commands,
-        0, -250,
-        &sprite_template,
-        idle_handler.clone(),
-        walk_handler.clone(),
-        &mut debug_log,
-        5
     );
 
     debug_log.add("✅ All RedSlimes spawned successfully");

@@ -7,7 +7,7 @@ use super::state::{
     FENCE_TEXTURE_PATH, FENCE_ATLAS_COLS, FENCE_ATLAS_ROWS,
     FENCE_IMAGE_WIDTH, FENCE_IMAGE_HEIGHT, FENCE_SPRITE_SIZE_X, FENCE_SPRITE_SIZE_Y,
     FENCE_COLLIDER_WIDTH, FENCE_COLLIDER_HEIGHT, FENCE_COLLIDER_OFFSET_X, FENCE_COLLIDER_OFFSET_Y,
-    FENCES_TO_SPAWN,
+    FENCES_TO_SPAWN, TILE_SIZE,
 };
 
 pub fn spawn_fences(
@@ -28,7 +28,7 @@ pub fn spawn_fences(
         sprite.texture_atlas.as_mut().unwrap().index = fence.variant;
 
         commands.spawn((sprite, Tile))
-            .at(fence.x * 64, fence.y * 64, DepthLayer::Entities(0))
+            .at(fence.x * TILE_SIZE as i32, fence.y * TILE_SIZE as i32, DepthLayer::Entities(0))
             .as_static_body()
             .use_depth_ordered_draw_once()
             .with_rect_collider(

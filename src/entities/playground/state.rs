@@ -1,4 +1,4 @@
-pub const TILE_SIZE: f32 = 64.0;
+pub const TILE_SIZE: f32 = 16.0;
 pub const GRID_WIDTH: usize = 128;
 pub const GRID_HEIGHT: usize = 128;
 pub const TILE_TEXTURE_PATH: &str = "textures/ground/tile.png";
@@ -8,13 +8,13 @@ pub const FENCE_ATLAS_COLS: usize = 4;
 pub const FENCE_ATLAS_ROWS: usize = 4;
 pub const FENCE_IMAGE_WIDTH: u32 = 64;
 pub const FENCE_IMAGE_HEIGHT: u32 = 64;
-pub const FENCE_SPRITE_SIZE_X: f32 = 64.0;
-pub const FENCE_SPRITE_SIZE_Y: f32 = 64.0;
+pub const FENCE_SPRITE_SIZE_X: f32 = 16.0;
+pub const FENCE_SPRITE_SIZE_Y: f32 = 16.0;
 
-pub const FENCE_COLLIDER_WIDTH: i32 = 56;
-pub const FENCE_COLLIDER_HEIGHT: i32 = 4;
+pub const FENCE_COLLIDER_WIDTH: i32 = 14;
+pub const FENCE_COLLIDER_HEIGHT: i32 = 1;
 pub const FENCE_COLLIDER_OFFSET_X: i32 = 0;
-pub const FENCE_COLLIDER_OFFSET_Y: i32 = -24;
+pub const FENCE_COLLIDER_OFFSET_Y: i32 = -6;
 
 pub struct FenceSegment {
     pub x: i32,

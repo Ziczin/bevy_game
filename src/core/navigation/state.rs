@@ -3,7 +3,7 @@ use crate::components::core::DepthLayer;
 use crate::macros::markers;
 
 // === Размеры навигационной сетки ===
-pub const NAV_GRID_CELL_SIZE: f32 = 16.0;
+pub const NAV_GRID_CELL_SIZE: f32 = 4.0;
 pub const NAV_GRID_WIDTH: usize = 96;
 pub const NAV_GRID_HEIGHT: usize = 72;
 
@@ -30,12 +30,12 @@ pub const AGENT_CENTER_COLOR: Color = Color::srgba(0.8, 0.0, 0.8, 1.0);
 pub const AGENT_OUTLINE_COLOR: Color = Color::srgba(0.8, 0.0, 0.8, 0.5);
 
 // === Размеры визуализации ===
-pub const GRID_WALKABLE_SIZE: f32 = 4.0;
-pub const GRID_BLOCKED_SIZE: f32 = 6.0;
-pub const PATH_POINT_SIZE: f32 = 4.0;
-pub const PATH_LINE_THICKNESS: f32 = 2.0;
-pub const AGENT_CENTER_SIZE: f32 = 8.0;
-pub const AGENT_OUTLINE_THICKNESS: f32 = 2.0;
+pub const GRID_WALKABLE_SIZE: f32 = 1.0;
+pub const GRID_BLOCKED_SIZE: f32 = 2.0;
+pub const PATH_POINT_SIZE: f32 = 1.0;
+pub const PATH_LINE_THICKNESS: f32 = 1.0;
+pub const AGENT_CENTER_SIZE: f32 = 2.0;
+pub const AGENT_OUTLINE_THICKNESS: f32 = 1.0;
 pub const AGENT_OUTLINE_SEGMENTS: usize = 16;
 
 // === Маркеры визуализации ===

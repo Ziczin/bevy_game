@@ -6,7 +6,7 @@ use super::nav_grid::NavGrid;
 use super::grid_builder::rebuild_nav_grid;
 
 pub fn update_nav_grid_position(
-    mut grid: Option<ResMut<NavGrid>>,
+    grid: Option<ResMut<NavGrid>>,
     player_query: Query<&Transform, With<Player>>,
     spatial_query: SpatialQuery,
     mut debug_log: ResMut<DebugLogBuffer>,
