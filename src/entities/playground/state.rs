@@ -1,6 +1,6 @@
 pub const TILE_SIZE: f32 = 64.0;
-pub const GRID_WIDTH: usize = 24;
-pub const GRID_HEIGHT: usize = 24;
+pub const GRID_WIDTH: usize = 128;
+pub const GRID_HEIGHT: usize = 128;
 pub const TILE_TEXTURE_PATH: &str = "textures/ground/tile.png";
 
 pub const FENCE_TEXTURE_PATH: &str = "textures/ground/fence_tilemap.png";

@@ -26,10 +26,16 @@ const PATTERN: &[&str] = &[
     ".....#.####.#....",
     ".##.###.#.#.####.",
     "..#.###.##.##.#..",
+    "........#........",
+    "........#........",
+    "........#........",
+    "........#........",
+    "#################",
+
 ];
 
-const PATTERN_OFFSET_X: i32 = -8;
-const PATTERN_OFFSET_Y: i32 = 8;
+const PATTERN_OFFSET_X: i32 = -10;
+const PATTERN_OFFSET_Y: i32 = 20;
 
 #[inline]
 fn compute_moore_mask(x: i32, y: i32, tiles: &HashSet<(i32, i32)>) -> u8 {
