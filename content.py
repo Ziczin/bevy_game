@@ -4,7 +4,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 EXCLUDE_DIRS = {ROOT / "target", ROOT / ".git"}
-TEXT_EXTS = {".rs", ".json"}
+TEXT_EXTS = {".rs", ".json", ".toml"}
 
 def is_text_file(path: Path) -> bool:
     return path.suffix.lower() in TEXT_EXTS or path.suffix == ""

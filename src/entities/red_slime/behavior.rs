@@ -5,7 +5,6 @@ use crate::components::pathfinding::Pathfinder;
 use crate::core::debug_log::DebugLogBuffer;
 use super::state::{RedSlimeStateHandler, RedSlimeState, WALK_SPEED, WAYPOINT_ARRIVAL_THRESHOLD};
 
-/// Получает мировую позицию коллайдера агента
 fn get_collider_world_position(
     transform: &Transform,
     children: &Children,
@@ -55,8 +54,10 @@ pub fn behavior(
                             debug_log.add(format!("🎯 Slime {:?}: Moving to waypoint {}", entity, pathfinder.current_waypoint));
                         } else {
                             debug_log.add(format!("🏁 Slime {:?}: Reached final destination", entity));
+                            // ИСПРАВЛЕНИЕ: Обнуляем цель, чтобы слайм остановился, 
+                            // но НЕ очищаем массив path.
                             pathfinder.current_target = None;
-                            pathfinder.path.clear();
+                            // pathfinder.path.clear(); // ЭТА СТРОКА УДАЛЕНА
                         }
                     }
 

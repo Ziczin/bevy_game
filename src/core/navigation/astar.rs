@@ -3,7 +3,9 @@ use avian2d::prelude::*;
 use std::collections::BinaryHeap;
 use crate::components::core::GameLayer;
 use super::nav_grid::NavGrid;
-use super::state::{ASTAR_ORTHOGONAL_COST, ASTAR_DIAGONAL_COST, COLLIDER_MIN_SIZE, NO_ROTATION};
+use super::state::{
+    ASTAR_ORTHOGONAL_COST, ASTAR_DIAGONAL_COST, COLLIDER_MIN_SIZE, NO_ROTATION, NAV_GRID_CELL_SIZE,
+};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 struct Node {
@@ -30,7 +32,7 @@ pub fn find_path(
     goal: Vec2,
     spatial_query: &SpatialQuery,
     agent_half_size: Vec2,
-    arrival_threshold: f32,
+    arrival_threshold: f32, 
     occupied_cells: &std::collections::HashSet<(usize, usize)>,
 ) -> Option<Vec<Vec2>> {
     let Some((start_x, start_y)) = grid.world_to_grid(start) else { return None; };
@@ -57,11 +59,18 @@ pub fn find_path(
         (1, 1), (-1, 1), (1, -1), (-1, -1),
     ];
 
+    // ИСПРАВЛЕНИЕ: Используем константу NAV_GRID_CELL_SIZE вместо grid.cell_size и магического числа 4.0.
+    // Это компенсирует погрешность округления координат (мир -> сетка -> мир) ровно на размер одной клетки.
+    // Для arrival_threshold = 40.0 и NAV_GRID_CELL_SIZE = 4.0, порог будет 36.0.
+    let safe_threshold = (arrival_threshold - NAV_GRID_CELL_SIZE).max(NAV_GRID_CELL_SIZE);
+
     while let Some(current) = open_set.pop() {
         let current_world = grid.grid_to_world(current.x, current.y);
         let distance_to_goal = current_world.distance(goal);
         
-        if distance_to_goal <= arrival_threshold {
+        // Останавливаем поиск, как только подходим на безопасное расстояние.
+        // Это экономит ресурсы CPU, не просчитывая путь до самых 0 единиц.
+        if distance_to_goal <= safe_threshold { 
             let is_blocked = !spatial_query.shape_intersections(
                 &agent_collider,
                 current_world,

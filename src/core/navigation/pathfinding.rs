@@ -98,7 +98,13 @@ pub fn update_paths(
 
         let collider_pos = get_collider_world_position(transform, children, &child_query);
         
-        let distance_to_player = collider_pos.distance(player_pos);
+        // ИСПРАВЛЕНИЕ: Считаем расстояние от центра трансформации (спрайта),
+        // чтобы оно совпадало с логикой в brain.rs. Это убирает "дрожание"
+        // вокруг порога 40.0 из-за смещения коллайдера на -2 по оси Y.
+        let distance_to_player = transform.translation.xy().distance(player_pos);
+        
+        // Этот блок выступает "предохранителем". Как только слайм подходит на 40.0,
+        // мы очищаем путь и останавливаем его, не давая ему идти впритык.
         if distance_to_player <= pathfinder.arrival_threshold {
             if !pathfinder.path.is_empty() {
                 debug_log.add(format!("🎯 Slime {:?}: Arrived at target (distance: {:.1})", entity, distance_to_player));
