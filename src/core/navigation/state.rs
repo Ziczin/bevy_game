@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use crate::components::core::DepthLayer;
-use crate::{flags_for, markers};
+use crate::core::macros::bevy_custom::flags_for;
+use crate::core::macros::bevy_custom::markers;
 
 // === Размеры навигационной сетки ===
 pub const NAV_GRID_CELL_SIZE: f32 = 4.0;

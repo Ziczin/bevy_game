@@ -1,4 +1,5 @@
-use crate::{animation_states, behavior_states};
+use crate::core::macros::bevy_custom::animation_states;
+use crate::core::macros::state_machine::behavior_states;
 
 pub const WALK_SPEED: f32 = 25.0;
 pub const WALK_DISTANCE_START: f32 = 320.0;

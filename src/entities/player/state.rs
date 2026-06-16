@@ -1,4 +1,5 @@
-use crate::{animation_states, behavior_states};
+use crate::core::macros::bevy_custom::animation_states;
+use crate::core::macros::state_machine::behavior_states;
 
 pub const MOVING_SPEED: f32 = 50.0;
 pub const CAMERA_FOLLOW_SMOOTHNESS: f32 = 0.99;

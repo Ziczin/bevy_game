@@ -1,4 +1,3 @@
-#[macro_export]
 macro_rules! behavior_states {
     ($name:ident { $first:ident $(, $rest:ident)* $(,)? }) => {
         ::paste::paste! {
@@ -42,3 +41,5 @@ macro_rules! behavior_states {
         }
     };
 }
+
+pub(crate) use behavior_states;

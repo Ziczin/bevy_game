@@ -33,15 +33,15 @@ pub const FENCES_TO_SPAWN: [FenceSegment; 16] = [
     FenceSegment { x: 3, y: 1, variant: 5 },
     FenceSegment { x: 4, y: 1, variant: 6 },
 
-    FenceSegment { x: -4, y: 4, variant: 8 },
-    FenceSegment { x: -3, y: 4, variant: 7 },
-    FenceSegment { x: -2, y: 4, variant: 10 },
-    FenceSegment { x: -1, y: 4, variant: 11 },
+    FenceSegment { x: -4, y: 3, variant: 8 },
+    FenceSegment { x: -3, y: 3, variant: 7 },
+    FenceSegment { x: -2, y: 3, variant: 10 },
+    FenceSegment { x: -1, y: 3, variant: 11 },
 
-    FenceSegment { x: 1, y: 4, variant: 12 },
-    FenceSegment { x: 2, y: 4, variant: 13 },
-    FenceSegment { x: 3, y: 4, variant: 14 },
-    FenceSegment { x: 4, y: 4, variant: 15 },
+    FenceSegment { x: 1, y: 3, variant: 12 },
+    FenceSegment { x: 2, y: 3, variant: 13 },
+    FenceSegment { x: 3, y: 3, variant: 14 },
+    FenceSegment { x: 4, y: 3, variant: 15 },
 ];
 
 // === Дорожки (авто-тайлинг по соседству Мура) ===

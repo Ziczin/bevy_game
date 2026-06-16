@@ -1,4 +1,3 @@
-#[macro_export]
 macro_rules! component {
     ($name:ident { $($field:ident: $ty:ty),* $(,)? }) => {
         #[derive(::bevy::prelude::Component, ::std::default::Default)]
@@ -8,7 +7,6 @@ macro_rules! component {
     };
 }
 
-#[macro_export]
 macro_rules! resource {
     ($name:ident { $($field:ident : $ty:ty $( = $default:expr )? ),* $(,)? }) => {
         #[derive(::bevy::prelude::Resource)]
@@ -17,3 +15,7 @@ macro_rules! resource {
         }
     };
 }
+pub(crate) use {
+    component,
+    resource
+};
