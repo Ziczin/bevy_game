@@ -22,15 +22,26 @@ pub struct FenceSegment {
     pub variant: usize,
 }
 
-pub const FENCES_TO_SPAWN: [FenceSegment; 8] = [
-    FenceSegment { x: -6, y: 1, variant: 1 },
-    FenceSegment { x: -5, y: 1, variant: 5 },
-    FenceSegment { x: -4, y: 1, variant: 10 },
-    FenceSegment { x: -3, y: 1, variant: 15 },
-    FenceSegment { x: -1, y: 1, variant: 2 },
-    FenceSegment { x: 0, y: 1, variant: 11 },
-    FenceSegment { x: 1, y: 1, variant: 14 },
-    FenceSegment { x: 2, y: 1, variant: 3 },
+pub const FENCES_TO_SPAWN: [FenceSegment; 16] = [
+    FenceSegment { x: -4, y: 1, variant: 0 },
+    FenceSegment { x: -3, y: 1, variant: 1 },
+    FenceSegment { x: -2, y: 1, variant: 2 },
+    FenceSegment { x: -1, y: 1, variant: 3 },
+
+    FenceSegment { x: 1, y: 1, variant: 4 },
+    FenceSegment { x: 2, y: 1, variant: 4 },
+    FenceSegment { x: 3, y: 1, variant: 5 },
+    FenceSegment { x: 4, y: 1, variant: 6 },
+
+    FenceSegment { x: -4, y: 4, variant: 8 },
+    FenceSegment { x: -3, y: 4, variant: 7 },
+    FenceSegment { x: -2, y: 4, variant: 10 },
+    FenceSegment { x: -1, y: 4, variant: 11 },
+
+    FenceSegment { x: 1, y: 4, variant: 12 },
+    FenceSegment { x: 2, y: 4, variant: 13 },
+    FenceSegment { x: 3, y: 4, variant: 14 },
+    FenceSegment { x: 4, y: 4, variant: 15 },
 ];
 
 // === Дорожки (авто-тайлинг по соседству Мура) ===

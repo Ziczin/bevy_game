@@ -91,7 +91,7 @@ pub fn summon(
         idle_handler.clone(),
         walk_handler.clone(),
         &mut debug_log,
-        2
+        1
     );
 
     spawn_single_red_slime(
@@ -101,7 +101,7 @@ pub fn summon(
         idle_handler.clone(),
         walk_handler.clone(),
         &mut debug_log,
-        3
+        1
     );
 
     spawn_single_red_slime(
@@ -111,7 +111,7 @@ pub fn summon(
         idle_handler.clone(),
         walk_handler.clone(),
         &mut debug_log,
-        4
+        1
     );
 
     debug_log.add("✅ All RedSlimes spawned successfully");

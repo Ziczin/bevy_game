@@ -1,6 +1,5 @@
 mod components;
 mod systems;
-mod macros;
 mod entities;
 mod core;
 

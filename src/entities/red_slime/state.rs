@@ -1,7 +1,7 @@
-use crate::macros::{animation_states, behavior_states};
+use crate::{animation_states, behavior_states};
 
 pub const WALK_SPEED: f32 = 25.0;
-pub const WALK_DISTANCE_START: f32 = 250.0;
+pub const WALK_DISTANCE_START: f32 = 320.0;
 pub const WALK_DISTANCE_END: f32 = 40.0;
 pub const WAYPOINT_ARRIVAL_THRESHOLD: f32 = 4.0;
 

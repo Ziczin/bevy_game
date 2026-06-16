@@ -1,4 +1,4 @@
-use crate::macros::component;
+use crate::component;
 
 component!(FollowPlayer {
     smoothness: f32
