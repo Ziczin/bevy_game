@@ -16,7 +16,7 @@ const DEBUG_HITBOXS: bool = true;
 
 fn main() {
     let mut binding = App::new();
-    let mut app = binding
+    let app = binding
         .add_plugins((
             systems::base::BaseSystemsPlugin,
             PhysicsPlugins::default(),

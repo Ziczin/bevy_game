@@ -48,6 +48,8 @@ pub const FENCES_TO_SPAWN: [FenceSegment; 16] = [
 pub const PATH_TEXTURE_PATH: &str = "textures/ground/path_tilemap.png";
 pub const PATH_ATLAS_COLS: usize = 12;
 pub const PATH_ATLAS_ROWS: usize = 4;
+#[allow(dead_code)]
 pub const PATH_IMAGE_WIDTH: u32 = 196;
+#[allow(dead_code)]
 pub const PATH_IMAGE_HEIGHT: u32 = 64;
 pub const PATH_TILE_SIZE: f32 = 16.0;

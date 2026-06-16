@@ -7,6 +7,7 @@ macro_rules! component {
     };
 }
 
+#[allow(unused_macros)]
 macro_rules! resource {
     ($name:ident { $($field:ident : $ty:ty $( = $default:expr )? ),* $(,)? }) => {
         #[derive(::bevy::prelude::Resource)]
@@ -15,6 +16,8 @@ macro_rules! resource {
         }
     };
 }
+
+#[allow(unused_imports)]
 pub(crate) use {
     component,
     resource

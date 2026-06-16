@@ -38,6 +38,7 @@ const fn build_blob_map() -> [u8; 256] {
 pub const BLOB_MAP: [u8; 256] = build_blob_map();
 
 pub const ATLAS_COLS: usize = 12;
+#[allow(dead_code)]
 pub const ATLAS_ROWS: usize = 4;
 
 macro_rules! remap {
@@ -99,12 +100,14 @@ pub const BLOB_REMAP: [(u8, u8); 47] = remap! {
 };
 
 #[inline]
+#[allow(dead_code)]
 pub const fn get_blob_tile_index(mask: u8) -> usize {
     let algo_idx = BLOB_MAP[mask as usize] as usize;
     let (col, row) = BLOB_REMAP[algo_idx];
     ((row - 1) as usize) * ATLAS_COLS + ((col - 1) as usize)
 }
 
+#[allow(dead_code)]
 pub fn debug_print_blob_tiles() {
     let mut seen = [false; 47];
 

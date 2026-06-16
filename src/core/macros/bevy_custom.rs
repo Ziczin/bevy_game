@@ -18,6 +18,7 @@ macro_rules! animation_states {
     };
 }
 
+#[allow(unused_macros)]
 macro_rules! bevy_flags_inner {
     ($shift:expr, $first:ident $(, $rest:ident)*) => {
         const $first = 1 << $shift;
@@ -27,6 +28,7 @@ macro_rules! bevy_flags_inner {
     };
 }
 
+#[allow(unused_macros)]
 macro_rules! bevy_flags_impl {
     ($name:ident, $type:ty, $shift:expr, $($flags:ident),+ $(,)?) => {
         bitflags::bitflags! {
@@ -38,6 +40,7 @@ macro_rules! bevy_flags_impl {
     };
 }
 
+#[allow(unused_macros)]
 macro_rules! flags_for {
     ($name:ident, $type:ty, $($flags:ident),+ $(,)?) => {
         bevy_flags_impl!($name, $type, 0, $($flags),+);
