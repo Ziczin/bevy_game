@@ -2,8 +2,10 @@ use bevy::prelude::*;
 
 mod state;
 mod summon;
-mod handle_input;
+mod brain;
 mod animation;
+mod handle_input;
+mod behavior;
 
 pub struct PlayerPlugin;
 
@@ -13,6 +15,9 @@ impl Plugin for PlayerPlugin {
             .add_systems(Startup, summon::summon)
             .add_systems(Update, (
                 handle_input::handle_input,
-            ).chain());
+                brain::brain,
+                behavior::behavior,
+            ).chain()
+        );
     }
 }

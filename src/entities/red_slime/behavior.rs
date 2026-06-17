@@ -54,10 +54,7 @@ pub fn behavior(
                             debug_log.add(format!("🎯 Slime {:?}: Moving to waypoint {}", entity, pathfinder.current_waypoint));
                         } else {
                             debug_log.add(format!("🏁 Slime {:?}: Reached final destination", entity));
-                            // ИСПРАВЛЕНИЕ: Обнуляем цель, чтобы слайм остановился, 
-                            // но НЕ очищаем массив path.
                             pathfinder.current_target = None;
-                            // pathfinder.path.clear(); // ЭТА СТРОКА УДАЛЕНА
                         }
                     }
 

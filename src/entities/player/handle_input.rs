@@ -1,18 +1,12 @@
 use bevy::prelude::*;
-use avian2d::prelude::*;
-use bevy_spritesheet_animation::prelude::*;
 
-use crate::components::markers::Player;
-use super::state::{MOVING_SPEED, PlayerStateHandler, PlayerState, PlayerAnimation};
+use crate::{components::markers::Player, core::debug_log::DebugLogBuffer};
+use super::state::{MovingDirection, PlayerLogicFlags};
 
 pub fn handle_input(
     keyboard: Res<ButtonInput<KeyCode>>,
-    mut player: Query<(
-        &mut LinearVelocity,
-        &mut SpritesheetAnimation,
-        &mut PlayerStateHandler,
-        &PlayerAnimation,
-    ), With<Player>>,
+    mut debug_log: ResMut<DebugLogBuffer>,
+    mut player: Query<(&mut MovingDirection, &PlayerLogicFlags), With<Player>>,
 ) {
     let mut direction = Vec2::ZERO;
     if keyboard.pressed(KeyCode::ArrowLeft)  { direction.x -= 1.0; }
@@ -24,18 +18,10 @@ pub fn handle_input(
         direction = direction.normalize();
     }
 
-    for (mut velocity, mut sprite_sheet, mut state_handler, animation) in &mut player {
-        velocity.x = direction.x * MOVING_SPEED;
-        velocity.y = direction.y * MOVING_SPEED;
-        
-        if velocity.length() > 0.0 {
-            if state_handler.set(PlayerState::Walk) {
-                sprite_sheet.switch(animation.walk.clone());
-            }
-        } else if sprite_sheet.progress.frame == 0 {
-            if state_handler.set(PlayerState::Idle) {
-                sprite_sheet.switch(animation.idle.clone());
-            }
+    for (mut player_direction, logic_flags) in &mut player {
+        if !logic_flags.contains(PlayerLogicFlags::CanMove) {
+            *player_direction = direction.into();
+            debug_log.add(format!("{}", direction));
         }
     }
 }

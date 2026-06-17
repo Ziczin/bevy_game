@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use crate::components::core::DepthLayer;
 #[allow(unused_imports)]
-use crate::core::macros::bevy_custom::flags_for;
 use crate::core::macros::bevy_custom::markers;
 
 // === Размеры навигационной сетки ===
