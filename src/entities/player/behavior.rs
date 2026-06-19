@@ -11,6 +11,7 @@ pub fn behavior(
         &MovingDirection,
     ), With<Player>>,
 ) {
+    let speed = *MOVING_SPEED;
 
     for (
         mut velocity,
@@ -18,8 +19,8 @@ pub fn behavior(
         direction
     ) in &mut player {
         if logic_flags.contains(PlayerLogicFlags::CanMove) {
-            velocity.x = direction.x * MOVING_SPEED;
-            velocity.y = direction.y * MOVING_SPEED;
+            velocity.x = direction.x * speed;
+            velocity.y = direction.y * speed;
         } else {
             velocity.x = 0.0;
             velocity.y = 0.0;

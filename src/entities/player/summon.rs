@@ -27,7 +27,7 @@ pub fn summon(
     commands.spawn((
         Camera2d,
         Msaa::Off,
-        FollowPlayer { smoothness: CAMERA_FOLLOW_SMOOTHNESS }
+        FollowPlayer { smoothness: *CAMERA_FOLLOW_SMOOTHNESS }
     ));
 
     let (spritesheet, sprite) = make_spritesheet(
@@ -52,10 +52,10 @@ pub fn summon(
     .as_dynamic_body()
     .use_depth_ordered_draw()
     .with_oval_collider(
-        PLAYER_COLLIDER_HALF_WIDTH,
-        PLAYER_COLLIDER_HALF_HEIGHT,
-        PLAYER_COLLIDER_OFFSET_X,
-        PLAYER_COLLIDER_OFFSET_Y,
+        *PLAYER_COLLIDER_HALF_WIDTH,
+        *PLAYER_COLLIDER_HALF_HEIGHT,
+        *PLAYER_COLLIDER_OFFSET_X,
+        *PLAYER_COLLIDER_OFFSET_Y,
         GameLayer::DynamicBody,
         [GameLayer::World, GameLayer::DynamicBody],
     );
