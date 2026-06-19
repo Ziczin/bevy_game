@@ -12,7 +12,7 @@ pub fn create_walk_animation(
         .add_cell(3, 0)
         .add_cell(2, 0)
         .set_clip_direction(AnimationDirection::PingPong)
-        .set_duration(AnimationDuration::PerFrame(75))
+        .set_duration(AnimationDuration::PerFrame(70))
         .set_repetitions(AnimationRepeat::Loop)
         .build()
     );

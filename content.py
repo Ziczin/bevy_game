@@ -10,7 +10,7 @@ def is_text_file(path: Path) -> bool:
     return path.suffix.lower() in TEXT_EXTS or path.suffix == ""
 
 def file_header(relpath: str) -> str:
-    return f"----- FILE: {relpath} -----\n"
+    return f"// FILE: {relpath}\n"
 
 def read_text(path: Path) -> str:
     try:

@@ -4,7 +4,7 @@ use crate::core::macros::state_machine::behavior_states;
 use bitflags;
 use bevy::prelude::*;
 
-pub const MOVING_SPEED: f32 = 80.0;
+pub const MOVING_SPEED: f32 = 40.0;
 pub const CAMERA_FOLLOW_SMOOTHNESS: f32 = 0.99;
 
 pub const PLAYER_COLLIDER_HALF_WIDTH: i32 = 4;

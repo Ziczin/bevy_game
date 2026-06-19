@@ -1,3 +1,4 @@
+// src/entities/player/brain.rs
 use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 
@@ -21,19 +22,29 @@ pub fn brain(
         animation,
         velocity
     ) in &mut player {
+        let was_can_move = logic_flags.contains(PlayerLogicFlags::CanMove);
+        
         logic_flags.set(
             PlayerLogicFlags::CanMove,
-            matches!(sprite_sheet.progress.frame, 4|5|6|7)
+            matches!(sprite_sheet.progress.frame, 3|4|5|6|7|8|9)
         );
-        debug_log.add(format!("Can move: {}", logic_flags.contains(PlayerLogicFlags::CanMove)));
-        if velocity.length() > 0.0 {
-            logic_flags.remove(PlayerLogicFlags::CanStop);
+        
+        let is_can_move = logic_flags.contains(PlayerLogicFlags::CanMove);
+        if was_can_move != is_can_move {
+            debug_log.add(format!("Can move: {}", is_can_move));
+        }
+        
+        let current_state = state_handler.get();
+        let vel_length = velocity.length();
+        
+        if vel_length > 0.0 {
             if state_handler.set(PlayerState::Walk) {
+                debug_log.add(format!("Player state: {:?} -> Walk (velocity: {:.2})", current_state, vel_length));
                 sprite_sheet.switch(animation.walk.clone());
             }
         } else if sprite_sheet.progress.frame == 0 {
-            logic_flags.insert(PlayerLogicFlags::CanStop);
             if state_handler.set(PlayerState::Idle) {
+                debug_log.add(format!("Player state: {:?} -> Idle (velocity: {:.2})", current_state, vel_length));
                 sprite_sheet.switch(animation.idle.clone());
             }
         }

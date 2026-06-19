@@ -1,41 +1,26 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
-use crate::components::pathfinding::Pathfinder;
-use crate::core::debug_log::DebugLogBuffer;
-use super::state::{RedSlimeStateHandler, RedSlimeState, WALK_SPEED, WAYPOINT_ARRIVAL_THRESHOLD};
-
-fn get_collider_world_position(
-    transform: &Transform,
-    children: &Children,
-    child_query: &Query<(&Transform, Option<&Collider>)>,
-) -> Vec2 {
-    for child in children.iter() {
-        if let Ok((child_transform, Some(_collider))) = child_query.get(child) {
-            return transform.translation.xy() + child_transform.translation.xy();
-        }
-    }
-    transform.translation.xy()
-}
+use crate::{entities::red_slime::state::MovingDirection};
+use super::state::{
+    RedSlimeStateHandler, RedSlimeState, RedSlimeLogicFlags,
+    WALK_SPEED
+};
 
 pub fn behavior(
     mut slime_query: Query<(
-        Entity,
         &mut LinearVelocity,
         &RedSlimeStateHandler,
-        &mut Pathfinder,
-        &Transform,
-        &Children,
+        &RedSlimeLogicFlags,
+        &MovingDirection,
     )>,
-    child_query: Query<(&Transform, Option<&Collider>)>,
-    mut debug_log: ResMut<DebugLogBuffer>,
 ) {
-    let mut count = 0;
-    
-    for (entity, mut velocity, state_handler, mut pathfinder, transform, children) in &mut slime_query {
-        count += 1;
-        
-        let collider_pos = get_collider_world_position(transform, children, &child_query);
+    for (
+        mut velocity,
+        state_handler,
+        logic_flags,
+        direction,
+    ) in &mut slime_query {
 
         match state_handler.get() {
             RedSlimeState::Idle => {
@@ -43,38 +28,14 @@ pub fn behavior(
                 velocity.y = 0.0;
             }
             RedSlimeState::Walk => {
-                if let Some(target) = pathfinder.current_target {
-                    let to_target = target - collider_pos;
-                    let distance_to_target = to_target.length();
-
-                    if distance_to_target < WAYPOINT_ARRIVAL_THRESHOLD {
-                        pathfinder.current_waypoint += 1;
-                        if pathfinder.current_waypoint < pathfinder.path.len() {
-                            pathfinder.current_target = Some(pathfinder.path[pathfinder.current_waypoint]);
-                            debug_log.add(format!("🎯 Slime {:?}: Moving to waypoint {}", entity, pathfinder.current_waypoint));
-                        } else {
-                            debug_log.add(format!("🏁 Slime {:?}: Reached final destination", entity));
-                            pathfinder.current_target = None;
-                        }
-                    }
-
-                    if let Some(current_target) = pathfinder.current_target {
-                        let direction = (current_target - collider_pos).normalize_or_zero();
-                        velocity.x = direction.x * WALK_SPEED;
-                        velocity.y = direction.y * WALK_SPEED;
-                    } else {
-                        velocity.x = 0.0;
-                        velocity.y = 0.0;
-                    }
+                if logic_flags.contains(RedSlimeLogicFlags::CanMove) {
+                    velocity.x = direction.x * WALK_SPEED;
+                    velocity.y = direction.y * WALK_SPEED;
                 } else {
                     velocity.x = 0.0;
                     velocity.y = 0.0;
                 }
             }
         }
-    }
-
-    if count == 0 {
-        debug_log.add("⚠️ behavior: No slimes found in query");
     }
 }

@@ -5,6 +5,7 @@ mod behavior;
 mod state;
 mod brain;
 mod summon;
+mod utils;
 
 pub struct RedSlimePlugin;
 

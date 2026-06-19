@@ -11,7 +11,7 @@ pub fn create_walk_animation(
         .add_partial_row(0, 1..)
         .add_cell(3, 0)
         .add_cell(2, 0)
-        .set_duration(AnimationDuration::PerFrame(70))
+        .set_duration(AnimationDuration::PerFrame(65))
         .set_repetitions(AnimationRepeat::Loop)
         .build()
     );

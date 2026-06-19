@@ -1,3 +1,4 @@
+// src/entities/player/handle_input.rs
 use bevy::prelude::*;
 
 use crate::{components::markers::Player, core::debug_log::DebugLogBuffer};
@@ -20,8 +21,10 @@ pub fn handle_input(
 
     for (mut player_direction, logic_flags) in &mut player {
         if !logic_flags.contains(PlayerLogicFlags::CanMove) {
+            if player_direction.0 != direction {
+                debug_log.add(format!("Player input: direction changed to ({:.2}, {:.2})", direction.x, direction.y));
+            }
             *player_direction = direction.into();
-            debug_log.add(format!("{}", direction));
         }
     }
 }

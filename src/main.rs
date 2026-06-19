@@ -11,8 +11,8 @@ use avian2d::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 
 const DEBUG_MESSAGE: bool = true;
-const DEBUG_NAVMESH: bool = true;
-const DEBUG_HITBOXS: bool = true;
+const DEBUG_NAVMESH: bool = false;
+const DEBUG_HITBOXS: bool = false;
 
 fn main() {
     let mut binding = App::new();

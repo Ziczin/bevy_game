@@ -1,3 +1,4 @@
+// src/core/debug_log.rs
 use bevy::prelude::*;
 use std::collections::HashSet;
 
@@ -9,13 +10,19 @@ pub struct DebugLogBuffer {
 }
 
 impl DebugLogBuffer {
+    #[cfg(debug_assertions)]
     pub fn add(&mut self, msg: impl Into<String>) {
         if self.enabled {
             self.messages.insert(msg.into());
         }
     }
+
+    #[cfg(not(debug_assertions))]
+    #[inline(always)]
+    pub fn add(&mut self, _msg: impl Into<String>) {}
 }
 
+#[cfg(debug_assertions)]
 pub fn flush_debug_logs(
     mut buffer: ResMut<DebugLogBuffer>,
     time: Res<Time>,
@@ -44,4 +51,11 @@ pub fn flush_debug_logs(
         
         buffer.messages.clear();
     }
+}
+
+#[cfg(not(debug_assertions))]
+pub fn flush_debug_logs(
+    _buffer: ResMut<DebugLogBuffer>,
+    _time: Res<Time>,
+) {
 }

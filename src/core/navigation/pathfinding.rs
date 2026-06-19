@@ -1,3 +1,4 @@
+// src/core/navigation/pathfinding.rs
 use bevy::prelude::*;
 use avian2d::prelude::*;
 use std::collections::HashSet;
@@ -98,13 +99,8 @@ pub fn update_paths(
 
         let collider_pos = get_collider_world_position(transform, children, &child_query);
         
-        // ИСПРАВЛЕНИЕ: Считаем расстояние от центра трансформации (спрайта),
-        // чтобы оно совпадало с логикой в brain.rs. Это убирает "дрожание"
-        // вокруг порога 40.0 из-за смещения коллайдера на -2 по оси Y.
         let distance_to_player = transform.translation.xy().distance(player_pos);
         
-        // Этот блок выступает "предохранителем". Как только слайм подходит на 40.0,
-        // мы очищаем путь и останавливаем его, не давая ему идти впритык.
         if distance_to_player <= pathfinder.arrival_threshold {
             if !pathfinder.path.is_empty() {
                 debug_log.add(format!("🎯 Slime {:?}: Arrived at target (distance: {:.1})", entity, distance_to_player));
@@ -120,7 +116,16 @@ pub fn update_paths(
         if pathfinder.update_timer >= pathfinder.update_interval {
             pathfinder.update_timer = 0.0;
             
-            debug_log.add(format!("🧠 Slime {:?}: Attempting to find path", entity));
+            if grid.world_to_grid(collider_pos).is_none() {
+                debug_log.add(format!("❌ Slime {:?}: Start position ({:.1}, {:.1}) is outside NavGrid", entity, collider_pos.x, collider_pos.y));
+                continue;
+            }
+            if grid.world_to_grid(player_pos).is_none() {
+                debug_log.add(format!("❌ Slime {:?}: Player position ({:.1}, {:.1}) is outside NavGrid", entity, player_pos.x, player_pos.y));
+                continue;
+            }
+
+            debug_log.add(format!("🧠 Slime {:?}: Attempting to find path from ({:.1}, {:.1}) to ({:.1}, {:.1})", entity, collider_pos.x, collider_pos.y, player_pos.x, player_pos.y));
             
             let mut occupied_without_self = HashSet::new();
             
@@ -137,6 +142,8 @@ pub fn update_paths(
                 );
                 occupied_without_self.extend(occupied);
             }
+            
+            debug_log.add(format!("🧠 Slime {:?}: Occupied cells count: {}", entity, occupied_without_self.len()));
             
             if let Some(new_path) = find_path(&grid, collider_pos, player_pos, &spatial_query, pathfinder.agent_half_size, pathfinder.arrival_threshold, &occupied_without_self) {
                 debug_log.add(format!("✅ Slime {:?}: Path found with {} waypoints", entity, new_path.len()));

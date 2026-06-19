@@ -1,3 +1,4 @@
+// src/core/navigation/grid_builder.rs
 use bevy::prelude::*;
 use avian2d::prelude::*;
 use crate::components::core::GameLayer;
@@ -6,11 +7,14 @@ use crate::core::debug_log::DebugLogBuffer;
 use super::nav_grid::NavGrid;
 use super::state::{NAV_GRID_CELL_SIZE, NAV_GRID_WIDTH, NAV_GRID_HEIGHT, NO_ROTATION};
 
-pub fn rebuild_nav_grid(grid: &mut NavGrid, spatial_query: &SpatialQuery) {
+pub fn rebuild_nav_grid(grid: &mut NavGrid, spatial_query: &SpatialQuery) -> (usize, usize) {
     let movement_filter = SpatialQueryFilter::from_mask([GameLayer::World]);
     let vision_filter = SpatialQueryFilter::from_mask([GameLayer::VisionBlock]);
 
     let cell_collider = Collider::rectangle(grid.cell_size, grid.cell_size);
+    
+    let mut walkable_count = 0;
+    let mut blocked_count = 0;
 
     for y in 0..grid.height {
         for x in 0..grid.width {
@@ -30,9 +34,17 @@ pub fn rebuild_nav_grid(grid: &mut NavGrid, spatial_query: &SpatialQuery) {
                 &vision_filter,
             ).is_empty();
             
-            grid.set_cell(x, y, !is_blocked_movement, is_blocked_vision);
+            let walkable = !is_blocked_movement;
+            grid.set_cell(x, y, walkable, is_blocked_vision);
+            
+            if walkable {
+                walkable_count += 1;
+            } else {
+                blocked_count += 1;
+            }
         }
     }
+    (walkable_count, blocked_count)
 }
 
 pub fn build_initial_nav_grid(
@@ -56,8 +68,8 @@ pub fn build_initial_nav_grid(
     let aligned_player_pos = Vec2::new(initial_origin_x, initial_origin_y);
     
     let mut grid = NavGrid::new(NAV_GRID_CELL_SIZE, NAV_GRID_WIDTH, NAV_GRID_HEIGHT, aligned_player_pos);
-    rebuild_nav_grid(&mut grid, &spatial_query);
+    let (walkable, blocked) = rebuild_nav_grid(&mut grid, &spatial_query);
     
     commands.insert_resource(grid);
-    debug_log.add(format!("✅ NavGrid построен: {}x{} клеток с выровненным центром", NAV_GRID_WIDTH, NAV_GRID_HEIGHT));
+    debug_log.add(format!("✅ NavGrid построен: {}x{} клеток. Walkable: {}, Blocked: {}", NAV_GRID_WIDTH, NAV_GRID_HEIGHT, walkable, blocked));
 }

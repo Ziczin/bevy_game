@@ -7,10 +7,11 @@ use crate::components::pathfinding::Pathfinder;
 use crate::core::extensions::EntityBuilderExt;
 use crate::core::make_spritesheet;
 use crate::core::debug_log::DebugLogBuffer;
+use crate::entities::red_slime::state::RedSlimeLogicFlags;
 use super::state::{
-    RedSlimeAnimation, RedSlimeStateHandler, WALK_DISTANCE_END,
-    PATHFINDER_UPDATE_INTERVAL, SPRITE_SIZE_MULTIPLIER_X, SPRITE_SIZE_MULTIPLIER_Y,
-    COLLIDER_PADDING, COLLIDER_OFFSET_X, COLLIDER_OFFSET_Y,
+    RedSlimeAnimation, RedSlimeStateHandler, MovingDirection,
+    WALK_DISTANCE_END, PATHFINDER_UPDATE_INTERVAL, SPRITE_SIZE_MULTIPLIER_X,
+    SPRITE_SIZE_MULTIPLIER_Y, COLLIDER_PADDING, COLLIDER_OFFSET_X, COLLIDER_OFFSET_Y,
 };
 use super::animation::{create_idle_animation, create_walk_animation};
 
@@ -41,6 +42,8 @@ pub fn spawn_single_red_slime(
         RedSlimeStateHandler::default(),
         Pathfinder::new(PATHFINDER_UPDATE_INTERVAL, agent_half_size, WALK_DISTANCE_END),
         LinearVelocity::default(),
+        MovingDirection::default(),
+        RedSlimeLogicFlags::default(),
     ))
     .at(x, y, DepthLayer::Entities(0))
     .as_dynamic_body()

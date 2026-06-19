@@ -1,3 +1,4 @@
+// src/core/navigation/grid_updater.rs
 use bevy::prelude::*;
 use avian2d::spatial_query::SpatialQuery;
 use crate::components::markers::Player;
@@ -31,7 +32,7 @@ pub fn update_nav_grid_position(
         
         grid.origin = Vec2::new(new_origin_x, new_origin_y);
         
-        rebuild_nav_grid(&mut grid, &spatial_query);
-        debug_log.add(format!("🔄 NavGrid snapped to new aligned origin: ({:.1}, {:.1})", grid.origin.x, grid.origin.y));
+        let (walkable, blocked) = rebuild_nav_grid(&mut grid, &spatial_query);
+        debug_log.add(format!("🔄 NavGrid snapped to ({:.1}, {:.1}). Walkable: {}, Blocked: {}", grid.origin.x, grid.origin.y, walkable, blocked));
     }
 }
