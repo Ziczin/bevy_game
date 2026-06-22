@@ -1,10 +1,11 @@
-use bevy::prelude::*;
+// src/core/make_spritesheet.rs
+use bevy::{asset::AssetPath, prelude::*};
 use bevy_spritesheet_animation::prelude::*;
 
 pub fn make_spritesheet(
     asset_server: &Res<AssetServer>,
     atlas_layouts: &mut ResMut<Assets<TextureAtlasLayout>>,
-    path: &'static str,
+    path: String,
     columns: usize,
     rows: usize,
     image_width: u32,
@@ -12,7 +13,7 @@ pub fn make_spritesheet(
     size_x: f32,
     size_y: f32,
 ) -> (Spritesheet, Sprite) {
-    let image = asset_server.load(path);
+    let image = asset_server.load(AssetPath::from(path));
     let spritesheet = Spritesheet::new(&image, columns, rows);
 
     let mut sprite = spritesheet

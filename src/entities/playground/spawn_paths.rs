@@ -1,3 +1,4 @@
+// src/entities/playground/spawn_paths.rs
 use bevy::prelude::*;
 use std::collections::HashSet;
 
@@ -31,7 +32,6 @@ const PATTERN: &[&str] = &[
     "........#........",
     "........#........",
     "#################",
-
 ];
 
 const PATTERN_OFFSET_X: i32 = -10;
@@ -76,9 +76,9 @@ pub fn spawn_paths(
 ) {
     let image = asset_server.load(PATH_TEXTURE_PATH);
     let layout = TextureAtlasLayout::from_grid(
-        UVec2::splat(PATH_TILE_SIZE as u32),
-        PATH_ATLAS_COLS as u32,
-        PATH_ATLAS_ROWS as u32,
+        UVec2::splat(*PATH_TILE_SIZE as u32),
+        *PATH_ATLAS_COLS as u32,
+        *PATH_ATLAS_ROWS as u32,
         None,
         None,
     );
@@ -86,6 +86,7 @@ pub fn spawn_paths(
 
     let path_tiles = create_pattern_tiles();
     let mut unique_sprites = HashSet::new();
+    let tile_size = *TILE_SIZE;
 
     for &(x, y) in &path_tiles {
         let mask = compute_moore_mask(x, y, &path_tiles);
@@ -94,8 +95,8 @@ pub fn spawn_paths(
 
         let layer = DepthLayer::Ground(1);
         let transform = Transform::from_xyz(
-            x as f32 * TILE_SIZE,
-            y as f32 * TILE_SIZE,
+            x as f32 * tile_size,
+            y as f32 * tile_size,
             layer.depth_value(),
         );
 
@@ -106,7 +107,7 @@ pub fn spawn_paths(
                     layout: layout_handle.clone(),
                     index: sprite_index,
                 }),
-                custom_size: Some(Vec2::splat(TILE_SIZE)),
+                custom_size: Some(Vec2::splat(tile_size)),
                 ..default()
             },
             TileMarker,

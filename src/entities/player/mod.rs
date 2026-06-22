@@ -1,9 +1,9 @@
+// src/entities/player/mod.rs
 use bevy::prelude::*;
 
 mod state;
 mod summon;
 mod brain;
-mod animation;
 mod handle_input;
 mod behavior;
 

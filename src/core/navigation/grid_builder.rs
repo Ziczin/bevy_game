@@ -21,27 +21,17 @@ pub fn rebuild_nav_grid(grid: &mut NavGrid, spatial_query: &SpatialQuery) -> (us
             let center = grid.grid_to_world(x, y);
             
             let is_blocked_movement = !spatial_query.shape_intersections(
-                &cell_collider,
-                center,
-                NO_ROTATION,
-                &movement_filter,
+                &cell_collider, center, *NO_ROTATION, &movement_filter,
             ).is_empty();
 
             let is_blocked_vision = !spatial_query.shape_intersections(
-                &cell_collider,
-                center,
-                NO_ROTATION,
-                &vision_filter,
+                &cell_collider, center, *NO_ROTATION, &vision_filter,
             ).is_empty();
             
             let walkable = !is_blocked_movement;
             grid.set_cell(x, y, walkable, is_blocked_vision);
             
-            if walkable {
-                walkable_count += 1;
-            } else {
-                blocked_count += 1;
-            }
+            if walkable { walkable_count += 1; } else { blocked_count += 1; }
         }
     }
     (walkable_count, blocked_count)
@@ -61,15 +51,19 @@ pub fn build_initial_nav_grid(
     };
     let player_pos = player_transform.translation.xy();
     
+    let cell_size = *NAV_GRID_CELL_SIZE;
+    let grid_width = *NAV_GRID_WIDTH;
+    let grid_height = *NAV_GRID_HEIGHT;
+    
     debug_log.add(format!("🔨 build_initial_nav_grid: Player found at ({:.1}, {:.1})", player_pos.x, player_pos.y));
     
-    let initial_origin_x = (player_pos.x / NAV_GRID_CELL_SIZE).round() * NAV_GRID_CELL_SIZE;
-    let initial_origin_y = (player_pos.y / NAV_GRID_CELL_SIZE).round() * NAV_GRID_CELL_SIZE;
+    let initial_origin_x = (player_pos.x / cell_size).round() * cell_size;
+    let initial_origin_y = (player_pos.y / cell_size).round() * cell_size;
     let aligned_player_pos = Vec2::new(initial_origin_x, initial_origin_y);
     
-    let mut grid = NavGrid::new(NAV_GRID_CELL_SIZE, NAV_GRID_WIDTH, NAV_GRID_HEIGHT, aligned_player_pos);
+    let mut grid = NavGrid::new(cell_size, grid_width, grid_height, aligned_player_pos);
     let (walkable, blocked) = rebuild_nav_grid(&mut grid, &spatial_query);
     
     commands.insert_resource(grid);
-    debug_log.add(format!("✅ NavGrid построен: {}x{} клеток. Walkable: {}, Blocked: {}", NAV_GRID_WIDTH, NAV_GRID_HEIGHT, walkable, blocked));
+    debug_log.add(format!("✅ NavGrid построен: {}x{} клеток. Walkable: {}, Blocked: {}", grid_width, grid_height, walkable, blocked));
 }

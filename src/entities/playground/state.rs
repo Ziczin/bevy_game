@@ -1,55 +1,27 @@
-pub const TILE_SIZE: f32 = 16.0;
-pub const GRID_WIDTH: usize = 128;
-pub const GRID_HEIGHT: usize = 128;
+// src/entities/playground/state.rs
+use crate::core::config::from_toml;
+use crate::core::dto::FenceSegment;
+
+from_toml!("config/playground.toml", [
+    TILE_SIZE: f32 = "tile.size",
+    GRID_WIDTH: usize = "tile.grid_width",
+    GRID_HEIGHT: usize = "tile.grid_height",
+    FENCE_ATLAS_COLS: usize = "fence.atlas_cols",
+    FENCE_ATLAS_ROWS: usize = "fence.atlas_rows",
+    FENCE_IMAGE_WIDTH: u32 = "fence.image_width",
+    FENCE_IMAGE_HEIGHT: u32 = "fence.image_height",
+    FENCE_SPRITE_SIZE_X: f32 = "fence.sprite_size_x",
+    FENCE_SPRITE_SIZE_Y: f32 = "fence.sprite_size_y",
+    FENCE_COLLIDER_WIDTH: i32 = "fence.collider_width",
+    FENCE_COLLIDER_HEIGHT: i32 = "fence.collider_height",
+    FENCE_COLLIDER_OFFSET_X: i32 = "fence.collider_offset_x",
+    FENCE_COLLIDER_OFFSET_Y: i32 = "fence.collider_offset_y",
+    FENCES: Vec<FenceSegment> = "fence.fences",
+    PATH_ATLAS_COLS: usize = "path.atlas_cols",
+    PATH_ATLAS_ROWS: usize = "path.atlas_rows",
+    PATH_TILE_SIZE: f32 = "path.tile_size",
+]);
+
 pub const TILE_TEXTURE_PATH: &str = "textures/ground/tile.png";
-
 pub const FENCE_TEXTURE_PATH: &str = "textures/ground/fence_tilemap.png";
-pub const FENCE_ATLAS_COLS: usize = 4;
-pub const FENCE_ATLAS_ROWS: usize = 4;
-pub const FENCE_IMAGE_WIDTH: u32 = 64;
-pub const FENCE_IMAGE_HEIGHT: u32 = 64;
-pub const FENCE_SPRITE_SIZE_X: f32 = 16.0;
-pub const FENCE_SPRITE_SIZE_Y: f32 = 16.0;
-
-pub const FENCE_COLLIDER_WIDTH: i32 = 14;
-pub const FENCE_COLLIDER_HEIGHT: i32 = 1;
-pub const FENCE_COLLIDER_OFFSET_X: i32 = 0;
-pub const FENCE_COLLIDER_OFFSET_Y: i32 = -6;
-
-pub struct FenceSegment {
-    pub x: i32,
-    pub y: i32,
-    pub variant: usize,
-}
-
-pub const FENCES_TO_SPAWN: [FenceSegment; 16] = [
-    FenceSegment { x: -4, y: 1, variant: 0 },
-    FenceSegment { x: -3, y: 1, variant: 1 },
-    FenceSegment { x: -2, y: 1, variant: 2 },
-    FenceSegment { x: -1, y: 1, variant: 3 },
-
-    FenceSegment { x: 1, y: 1, variant: 4 },
-    FenceSegment { x: 2, y: 1, variant: 4 },
-    FenceSegment { x: 3, y: 1, variant: 5 },
-    FenceSegment { x: 4, y: 1, variant: 6 },
-
-    FenceSegment { x: -6, y: 2, variant: 8 },
-    FenceSegment { x: -5, y: 2, variant: 7 },
-    FenceSegment { x: -4, y: 2, variant: 10 },
-    FenceSegment { x: -3, y: 2, variant: 11 },
-
-    FenceSegment { x: 3, y: 2, variant: 12 },
-    FenceSegment { x: 4, y: 2, variant: 13 },
-    FenceSegment { x: 5, y: 2, variant: 14 },
-    FenceSegment { x: 6, y: 2, variant: 15 },
-];
-
-// === Дорожки (авто-тайлинг по соседству Мура) ===
 pub const PATH_TEXTURE_PATH: &str = "textures/ground/path_tilemap.png";
-pub const PATH_ATLAS_COLS: usize = 12;
-pub const PATH_ATLAS_ROWS: usize = 4;
-#[allow(dead_code)]
-pub const PATH_IMAGE_WIDTH: u32 = 196;
-#[allow(dead_code)]
-pub const PATH_IMAGE_HEIGHT: u32 = 64;
-pub const PATH_TILE_SIZE: f32 = 16.0;

@@ -1,3 +1,4 @@
+// src/core/navigation/astar.rs
 use bevy::prelude::*;
 use avian2d::prelude::*;
 use std::collections::BinaryHeap;
@@ -22,7 +23,7 @@ impl Ord for Node {
 
 impl PartialOrd for Node {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        return Some(self.cmp(other));
+        Some(self.cmp(other))
     }
 }
 
@@ -38,9 +39,15 @@ pub fn find_path(
     let Some((start_x, start_y)) = grid.world_to_grid(start) else { return None; };
     let Some((goal_x, goal_y)) = grid.world_to_grid(goal) else { return None; };
 
+    let collider_min_size = *COLLIDER_MIN_SIZE;
+    let astar_orthogonal_cost = *ASTAR_ORTHOGONAL_COST;
+    let astar_diagonal_cost = *ASTAR_DIAGONAL_COST;
+    let nav_grid_cell_size = *NAV_GRID_CELL_SIZE;
+    let no_rotation = *NO_ROTATION;
+
     let agent_collider = Collider::ellipse(
-        agent_half_size.x.max(COLLIDER_MIN_SIZE), 
-        agent_half_size.y.max(COLLIDER_MIN_SIZE)
+        agent_half_size.x.max(collider_min_size), 
+        agent_half_size.y.max(collider_min_size)
     );
     let filter = SpatialQueryFilter::from_mask([GameLayer::World]);
 
@@ -59,23 +66,15 @@ pub fn find_path(
         (1, 1), (-1, 1), (1, -1), (-1, -1),
     ];
 
-    // ИСПРАВЛЕНИЕ: Используем константу NAV_GRID_CELL_SIZE вместо grid.cell_size и магического числа 4.0.
-    // Это компенсирует погрешность округления координат (мир -> сетка -> мир) ровно на размер одной клетки.
-    // Для arrival_threshold = 40.0 и NAV_GRID_CELL_SIZE = 4.0, порог будет 36.0.
-    let safe_threshold = (arrival_threshold - NAV_GRID_CELL_SIZE).max(NAV_GRID_CELL_SIZE);
+    let safe_threshold = (arrival_threshold - nav_grid_cell_size).max(nav_grid_cell_size);
 
     while let Some(current) = open_set.pop() {
         let current_world = grid.grid_to_world(current.x, current.y);
         let distance_to_goal = current_world.distance(goal);
         
-        // Останавливаем поиск, как только подходим на безопасное расстояние.
-        // Это экономит ресурсы CPU, не просчитывая путь до самых 0 единиц.
         if distance_to_goal <= safe_threshold { 
             let is_blocked = !spatial_query.shape_intersections(
-                &agent_collider,
-                current_world,
-                NO_ROTATION,
-                &filter,
+                &agent_collider, current_world, no_rotation, &filter,
             ).is_empty();
             
             if !is_blocked {
@@ -85,7 +84,6 @@ pub fn find_path(
                 while curr_idx != start_idx {
                     curr_idx = came_from[curr_idx];
                     if curr_idx == usize::MAX { break; }
-                    
                     let cx = curr_idx % grid.width;
                     let cy = curr_idx / grid.width;
                     path.push(grid.grid_to_world(cx, cy));
@@ -104,35 +102,24 @@ pub fn find_path(
                 let nx = nx as usize;
                 let ny = ny as usize;
 
-                if occupied_cells.contains(&(nx, ny)) {
-                    continue;
-                }
+                if occupied_cells.contains(&(nx, ny)) { continue; }
 
                 let Some((walkable, _)) = grid.get_cell(nx, ny) else { continue; };
-                if !walkable {
-                    continue;
-                }
+                if !walkable { continue; }
 
                 if dx != 0 && dy != 0 {
                     let Some((w1, _)) = grid.get_cell(current.x, ny) else { continue; };
                     let Some((w2, _)) = grid.get_cell(nx, current.y) else { continue; };
-                    if !w1 || !w2 {
-                        continue;
-                    }
+                    if !w1 || !w2 { continue; }
                 }
 
                 let cell_center = grid.grid_to_world(nx, ny);
                 let is_blocked = !spatial_query.shape_intersections(
-                    &agent_collider,
-                    cell_center,
-                    NO_ROTATION,
-                    &filter,
+                    &agent_collider, cell_center, no_rotation, &filter,
                 ).is_empty();
-                if is_blocked {
-                    continue;
-                }
+                if is_blocked { continue; }
 
-                let move_cost = if dx != 0 && dy != 0 { ASTAR_DIAGONAL_COST } else { ASTAR_ORTHOGONAL_COST };
+                let move_cost = if dx != 0 && dy != 0 { astar_diagonal_cost } else { astar_orthogonal_cost };
                 
                 let curr_idx = current.y * grid.width + current.x;
                 let n_idx = ny * grid.width + nx;
@@ -143,16 +130,12 @@ pub fn find_path(
                     came_from[n_idx] = curr_idx;
                     g_score[n_idx] = tentative_g;
                     
-                    let h_score = ((nx as i32 - goal_x as i32).abs() + (ny as i32 - goal_y as i32).abs()) * ASTAR_ORTHOGONAL_COST;
-                    open_set.push(Node {
-                        x: nx,
-                        y: ny,
-                        f_score: tentative_g + h_score,
-                    });
+                    let h_score = ((nx as i32 - goal_x as i32).abs() + (ny as i32 - goal_y as i32).abs()) * astar_orthogonal_cost;
+                    open_set.push(Node { x: nx, y: ny, f_score: tentative_g + h_score });
                 }
             }
         }
     }
 
-    return None;
+    None
 }

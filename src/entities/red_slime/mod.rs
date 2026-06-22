@@ -1,6 +1,6 @@
+// src/entities/red_slime/mod.rs
 use bevy::prelude::*;
 
-mod animation;
 mod behavior;
 mod state;
 mod brain;

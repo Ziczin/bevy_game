@@ -1,3 +1,4 @@
+// src/entities/red_slime/summon.rs
 use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 use avian2d::prelude::*;
@@ -6,14 +7,15 @@ use crate::components::core::{DepthLayer, GameLayer};
 use crate::components::pathfinding::Pathfinder;
 use crate::core::extensions::EntityBuilderExt;
 use crate::core::make_spritesheet;
+use crate::core::animation::create_animation;
 use crate::core::debug_log::DebugLogBuffer;
 use crate::entities::red_slime::state::RedSlimeLogicFlags;
 use super::state::{
     RedSlimeAnimation, RedSlimeStateHandler, MovingDirection,
     WALK_DISTANCE_END, PATHFINDER_UPDATE_INTERVAL, SPRITE_SIZE_MULTIPLIER_X,
     SPRITE_SIZE_MULTIPLIER_Y, COLLIDER_PADDING, COLLIDER_OFFSET_X, COLLIDER_OFFSET_Y,
+    SPRITESHEET, ANIMATIONS,
 };
-use super::animation::{create_idle_animation, create_walk_animation};
 
 pub fn spawn_single_red_slime(
     commands: &mut Commands,
@@ -27,10 +29,10 @@ pub fn spawn_single_red_slime(
 ) {
     let sprite = sprite_template.clone();
     
-    let width = size * SPRITE_SIZE_MULTIPLIER_X;
-    let height = size * SPRITE_SIZE_MULTIPLIER_Y;
+    let width = size * *SPRITE_SIZE_MULTIPLIER_X;
+    let height = size * *SPRITE_SIZE_MULTIPLIER_Y;
 
-    let agent_half_size = Vec2::new(width as f32 + COLLIDER_PADDING, height as f32 + COLLIDER_PADDING);
+    let agent_half_size = Vec2::new(width as f32 + *COLLIDER_PADDING, height as f32 + *COLLIDER_PADDING);
     
     let entity = commands.spawn((
         sprite,
@@ -40,7 +42,7 @@ pub fn spawn_single_red_slime(
             walk: walk_anim, 
         },
         RedSlimeStateHandler::default(),
-        Pathfinder::new(PATHFINDER_UPDATE_INTERVAL, agent_half_size, WALK_DISTANCE_END),
+        Pathfinder::new(*PATHFINDER_UPDATE_INTERVAL, agent_half_size, *WALK_DISTANCE_END),
         LinearVelocity::default(),
         MovingDirection::default(),
         RedSlimeLogicFlags::default(),
@@ -50,7 +52,7 @@ pub fn spawn_single_red_slime(
     .use_depth_ordered_draw()
     .with_oval_collider(
         width, height,
-        COLLIDER_OFFSET_X, COLLIDER_OFFSET_Y,
+        *COLLIDER_OFFSET_X, *COLLIDER_OFFSET_Y,
         GameLayer::DynamicBody,
         [GameLayer::World, GameLayer::DynamicBody],
     )
@@ -68,54 +70,25 @@ pub fn summon(
 ) {
     debug_log.add("🎬 RedSlime summon started");
 
+    let ss = &*SPRITESHEET;
     let (spritesheet, sprite_template) = make_spritesheet(
         &asset_server, &mut atlas_layouts,
-        "textures/red_slime/red_slime_tilemap.png",
-        8, 1, 128, 16, 16.0, 16.0
+        ss.path.clone(), ss.columns, ss.rows,
+        ss.image_width, ss.image_height,
+        ss.size_x, ss.size_y
     );
 
-    let idle_handler = create_idle_animation(&spritesheet, &mut animations);
-    let walk_handler = create_walk_animation(&spritesheet, &mut animations);
+    let anim_configs = &*ANIMATIONS;
+    let walk_config = anim_configs.iter().find(|c| c.name == "walk").expect("Missing 'walk' animation");
+    let idle_config = anim_configs.iter().find(|c| c.name == "idle").expect("Missing 'idle' animation");
 
-    spawn_single_red_slime(
-        &mut commands,
-        50, 0,
-        &sprite_template,
-        idle_handler.clone(),
-        walk_handler.clone(),
-        &mut debug_log,
-        1
-    );
+    let idle_handler = create_animation(&spritesheet, &mut animations, idle_config);
+    let walk_handler = create_animation(&spritesheet, &mut animations, walk_config);
 
-    spawn_single_red_slime(
-        &mut commands,
-        -50, 25,
-        &sprite_template,
-        idle_handler.clone(),
-        walk_handler.clone(),
-        &mut debug_log,
-        1
-    );
-
-    spawn_single_red_slime(
-        &mut commands,
-        0, -38,
-        &sprite_template,
-        idle_handler.clone(),
-        walk_handler.clone(),
-        &mut debug_log,
-        1
-    );
-
-    spawn_single_red_slime(
-        &mut commands,
-        0, -62,
-        &sprite_template,
-        idle_handler.clone(),
-        walk_handler.clone(),
-        &mut debug_log,
-        1
-    );
+    spawn_single_red_slime(&mut commands, 50, 0, &sprite_template, idle_handler.clone(), walk_handler.clone(), &mut debug_log, 1);
+    spawn_single_red_slime(&mut commands, -50, 25, &sprite_template, idle_handler.clone(), walk_handler.clone(), &mut debug_log, 1);
+    spawn_single_red_slime(&mut commands, 0, -38, &sprite_template, idle_handler.clone(), walk_handler.clone(), &mut debug_log, 1);
+    spawn_single_red_slime(&mut commands, 0, -62, &sprite_template, idle_handler.clone(), walk_handler.clone(), &mut debug_log, 1);
 
     debug_log.add("✅ All RedSlimes spawned successfully");
 }

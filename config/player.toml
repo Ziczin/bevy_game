@@ -1,6 +1,33 @@
-MOVING_SPEED = 40.0
-CAMERA_FOLLOW_SMOOTHNESS = 0.99
-PLAYER_COLLIDER_HALF_WIDTH = 4
-PLAYER_COLLIDER_HALF_HEIGHT = 4
-PLAYER_COLLIDER_OFFSET_X = 0
-PLAYER_COLLIDER_OFFSET_Y = -4
+# config/player.toml
+[moving]
+speed = 60.0
+camera_follow_smoothness = 0.99
+
+[collider]
+half_width = 4
+half_height = 4
+offset_x = 0
+offset_y = -4
+
+[spritesheet]
+path = "textures/player/player_tilemap.png"
+columns = 10
+rows = 1
+image_width = 160
+image_height = 16
+size_x = 16.0
+size_y = 16.0
+
+[[animations]]
+name = "walk"
+frames = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+duration_ms = 50
+loop = true
+ping_pong = false
+
+[[animations]]
+name = "idle"
+frames = [0, 1, 2]
+duration_ms = 1111
+loop = false
+ping_pong = false

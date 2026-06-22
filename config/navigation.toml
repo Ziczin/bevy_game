@@ -1,0 +1,14 @@
+# config/navigation.toml
+[grid]
+cell_size = 4.0
+width = 96
+height = 72
+
+[astar]
+orthogonal_cost = 10
+diagonal_cost = 14
+
+[physics]
+collider_min_size = 0.1
+ellipse_threshold = 1.0
+no_rotation = 0.0

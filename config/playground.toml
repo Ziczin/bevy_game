@@ -1,0 +1,41 @@
+# config/playground.toml
+[tile]
+size = 16.0
+grid_width = 128
+grid_height = 128
+
+[fence]
+atlas_cols = 4
+atlas_rows = 4
+image_width = 64
+image_height = 64
+sprite_size_x = 16.0
+sprite_size_y = 16.0
+collider_width = 14
+collider_height = 1
+collider_offset_x = 0
+collider_offset_y = -6
+
+fences = [
+    { x = -4, y = 1, variant = 0 },
+    { x = -3, y = 1, variant = 1 },
+    { x = -2, y = 1, variant = 2 },
+    { x = -1, y = 1, variant = 3 },
+    { x = 1, y = 1, variant = 4 },
+    { x = 2, y = 1, variant = 4 },
+    { x = 3, y = 1, variant = 5 },
+    { x = 4, y = 1, variant = 6 },
+    { x = -6, y = 2, variant = 8 },
+    { x = -5, y = 2, variant = 7 },
+    { x = -4, y = 2, variant = 10 },
+    { x = -3, y = 2, variant = 11 },
+    { x = 3, y = 2, variant = 12 },
+    { x = 4, y = 2, variant = 13 },
+    { x = 5, y = 2, variant = 14 },
+    { x = 6, y = 2, variant = 15 },
+]
+
+[path]
+atlas_cols = 12
+atlas_rows = 4
+tile_size = 16.0

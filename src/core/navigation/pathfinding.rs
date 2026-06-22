@@ -30,12 +30,13 @@ fn get_occupied_cells(
 ) -> HashSet<(usize, usize)> {
     let mut cells = HashSet::new();
 
-    let rx = (other_half_size.x + current_half_size.x).max(COLLIDER_MIN_SIZE);
-    let ry = (other_half_size.y + current_half_size.y).max(COLLIDER_MIN_SIZE);
+    let collider_min_size = *COLLIDER_MIN_SIZE;
+    let ellipse_threshold = *ELLIPSE_THRESHOLD;
 
-    let Some((agent_gx, agent_gy)) = grid.world_to_grid(other_pos) else {
-        return cells;
-    };
+    let rx = (other_half_size.x + current_half_size.x).max(collider_min_size);
+    let ry = (other_half_size.y + current_half_size.y).max(collider_min_size);
+
+    let Some((agent_gx, agent_gy)) = grid.world_to_grid(other_pos) else { return cells; };
 
     let cells_rx = (rx / grid.cell_size).ceil() as isize + 1;
     let cells_ry = (ry / grid.cell_size).ceil() as isize + 1;
@@ -45,16 +46,14 @@ fn get_occupied_cells(
             let gx = (agent_gx as isize + dx) as usize;
             let gy = (agent_gy as isize + dy) as usize;
 
-            if gx >= grid.width || gy >= grid.height {
-                continue;
-            }
+            if gx >= grid.width || gy >= grid.height { continue; }
 
             let cell_center = grid.grid_to_world(gx, gy);
 
             let norm_x = (cell_center.x - other_pos.x) / rx;
             let norm_y = (cell_center.y - other_pos.y) / ry;
 
-            if norm_x * norm_x + norm_y * norm_y <= ELLIPSE_THRESHOLD {
+            if norm_x * norm_x + norm_y * norm_y <= ellipse_threshold {
                 cells.insert((gx, gy));
             }
         }
@@ -93,12 +92,9 @@ pub fn update_paths(
     for (entity, transform, children, mut pathfinder) in &mut pathfinder_query {
         count += 1;
         
-        if !pathfinder.is_active {
-            continue;
-        }
+        if !pathfinder.is_active { continue; }
 
         let collider_pos = get_collider_world_position(transform, children, &child_query);
-        
         let distance_to_player = transform.translation.xy().distance(player_pos);
         
         if distance_to_player <= pathfinder.arrival_threshold {
@@ -130,16 +126,8 @@ pub fn update_paths(
             let mut occupied_without_self = HashSet::new();
             
             for (other_entity, other_pos, other_half_size) in &agent_data {
-                if *other_entity == entity {
-                    continue;
-                }
-                
-                let occupied = get_occupied_cells(
-                    &grid, 
-                    *other_pos, 
-                    *other_half_size, 
-                    pathfinder.agent_half_size
-                );
+                if *other_entity == entity { continue; }
+                let occupied = get_occupied_cells(&grid, *other_pos, *other_half_size, pathfinder.agent_half_size);
                 occupied_without_self.extend(occupied);
             }
             

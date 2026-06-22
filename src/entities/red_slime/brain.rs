@@ -31,6 +31,11 @@ pub fn brain(
 ) {
     let Ok(player_transform) = player_query.single() else { return; };
 
+    let walk_distance_end = *WALK_DISTANCE_END;
+    let walk_distance_start = *WALK_DISTANCE_START;
+    let expected_idle_frame = *EXPECTED_IDLE_FRAME;
+    let waypoint_arrival_threshold = *WAYPOINT_ARRIVAL_THRESHOLD;
+
     for (
         entity,
         mut state_handler, 
@@ -47,7 +52,7 @@ pub fn brain(
         let distance = enemy_pos.distance(player_pos);
 
         let was_active = pathfinder.is_active;
-        pathfinder.is_active = distance >= WALK_DISTANCE_END && distance <= WALK_DISTANCE_START;
+        pathfinder.is_active = distance >= walk_distance_end && distance <= walk_distance_start;
         
         if pathfinder.is_active != was_active {
             debug_log.add(format!("RedSlime {:?}: Pathfinder active: {} (distance: {:.1})", entity, pathfinder.is_active, distance));
@@ -67,7 +72,7 @@ pub fn brain(
                 debug_log.add(format!("RedSlime {:?}: State -> Walk", entity));
                 sprite_sheet.switch(animation.walk.clone());
             }
-        } else if sprite_sheet.progress.frame == EXPECTED_IDLE_FRAME {
+        } else if sprite_sheet.progress.frame == expected_idle_frame {
             if state_handler.set(RedSlimeState::Idle) {
                 debug_log.add(format!("RedSlime {:?}: State -> Idle", entity));
                 sprite_sheet.switch(animation.idle.clone());
@@ -76,7 +81,7 @@ pub fn brain(
         
         if can_maneuver {
             if let Some(target) = pathfinder.current_target {
-                if (target - collider_pos).length() < WAYPOINT_ARRIVAL_THRESHOLD {
+                if (target - collider_pos).length() < waypoint_arrival_threshold {
                     debug_log.add(format!("RedSlime {:?}: Reached waypoint at ({:.1}, {:.1})", entity, target.x, target.y));
                     pathfinder.current_waypoint += 1;
                     if pathfinder.current_waypoint < pathfinder.path.len() {

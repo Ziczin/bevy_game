@@ -1,3 +1,4 @@
+// src/entities/red_slime/behavior.rs
 use bevy::prelude::*;
 use avian2d::prelude::*;
 
@@ -15,6 +16,8 @@ pub fn behavior(
         &MovingDirection,
     )>,
 ) {
+    let speed = *WALK_SPEED;
+
     for (
         mut velocity,
         state_handler,
@@ -29,8 +32,8 @@ pub fn behavior(
             }
             RedSlimeState::Walk => {
                 if logic_flags.contains(RedSlimeLogicFlags::CanMove) {
-                    velocity.x = direction.x * WALK_SPEED;
-                    velocity.y = direction.y * WALK_SPEED;
+                    velocity.x = direction.x * speed;
+                    velocity.y = direction.y * speed;
                 } else {
                     velocity.x = 0.0;
                     velocity.y = 0.0;

@@ -1,0 +1,40 @@
+# config/red_slime.toml
+[moving]
+walk_speed = 25.0
+walk_distance_start = 320.0
+walk_distance_end = 40.0
+waypoint_arrival_threshold = 4.0
+pathfinder_update_interval = 0.5
+
+[sprite]
+size_multiplier_x = 4
+size_multiplier_y = 4
+
+[collider]
+padding = 0.5
+offset_x = 0
+offset_y = -2
+expected_idle_frame = 0
+
+[spritesheet]
+path = "textures/red_slime/red_slime_tilemap.png"
+columns = 10
+rows = 1
+image_width = 160
+image_height = 16
+size_x = 16.0
+size_y = 16.0
+
+[[animations]]
+name = "walk"
+frames = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+duration_ms = 50
+loop = true
+ping_pong = false
+
+[[animations]]
+name = "idle"
+frames = [0, 1, 2, 1]
+duration_ms = 1234
+loop = false
+ping_pong = true
