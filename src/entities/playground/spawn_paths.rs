@@ -7,7 +7,7 @@ use crate::components::core::DepthLayer;
 use crate::core::blob_tilemap::get_blob_tile_index;
 use super::state::{
     PATH_TEXTURE_PATH, PATH_ATLAS_COLS, PATH_ATLAS_ROWS,
-    PATH_TILE_SIZE, TILE_SIZE,
+    TILE_SIZE,
 };
 
 const PATTERN: &[&str] = &[
@@ -75,8 +75,10 @@ pub fn spawn_paths(
     mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     let image = asset_server.load(PATH_TEXTURE_PATH);
+    let tile_size = *TILE_SIZE;
+    
     let layout = TextureAtlasLayout::from_grid(
-        UVec2::splat(*PATH_TILE_SIZE as u32),
+        UVec2::splat(tile_size as u32),
         *PATH_ATLAS_COLS as u32,
         *PATH_ATLAS_ROWS as u32,
         None,
@@ -86,7 +88,6 @@ pub fn spawn_paths(
 
     let path_tiles = create_pattern_tiles();
     let mut unique_sprites = HashSet::new();
-    let tile_size = *TILE_SIZE;
 
     for &(x, y) in &path_tiles {
         let mask = compute_moore_mask(x, y, &path_tiles);

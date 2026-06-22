@@ -1,6 +1,6 @@
 // src/core/config.rs
 use std::fs;
-use bevy::math::Vec2;
+use bevy::math::{Vec2, Vec4};
 
 pub trait FromTomlValue: Sized {
     fn from_toml_value(value: &toml::Value) -> Self;
@@ -54,6 +54,21 @@ impl FromTomlValue for Vec2 {
         Vec2::new(
             arr[0].as_float().unwrap_or_else(|| panic!("Expected f32 for Vec2.x")) as f32,
             arr[1].as_float().unwrap_or_else(|| panic!("Expected f32 for Vec2.y")) as f32,
+        )
+    }
+}
+
+impl FromTomlValue for Vec4 {
+    fn from_toml_value(value: &toml::Value) -> Self {
+        let arr = value.as_array().unwrap_or_else(|| panic!("Expected array for Vec4, got {:?}", value));
+        if arr.len() != 4 {
+            panic!("Expected array of 4 elements for Vec4, got {}", arr.len());
+        }
+        Vec4::new(
+            arr[0].as_float().unwrap_or_else(|| panic!("Expected f32 for Vec4.x")) as f32,
+            arr[1].as_float().unwrap_or_else(|| panic!("Expected f32 for Vec4.y")) as f32,
+            arr[2].as_float().unwrap_or_else(|| panic!("Expected f32 for Vec4.z")) as f32,
+            arr[3].as_float().unwrap_or_else(|| panic!("Expected f32 for Vec4.w")) as f32,
         )
     }
 }

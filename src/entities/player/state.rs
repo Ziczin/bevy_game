@@ -9,13 +9,17 @@ use bevy::prelude::*;
 
 from_toml!("config/player.toml", [
     MOVING_SPEED: f32 = "moving.speed",
-    CAMERA_FOLLOW_SMOOTHNESS: f32 = "moving.camera_follow_smoothness",
     PLAYER_COLLIDER_HALF_WIDTH: i32 = "collider.half_width",
     PLAYER_COLLIDER_HALF_HEIGHT: i32 = "collider.half_height",
     PLAYER_COLLIDER_OFFSET_X: i32 = "collider.offset_x",
     PLAYER_COLLIDER_OFFSET_Y: i32 = "collider.offset_y",
     SPRITESHEET: SpriteSheetConfig = "spritesheet",
     ANIMATIONS: Vec<AnimationConfig> = "animations",
+]);
+
+from_toml!("config/global.toml", [
+    CAMERA_FOLLOW_SMOOTHNESS: f32 = "camera.follow_smoothness",
+    TILE_SIZE: f32 = "display.tile_size",
 ]);
 
 behavior_states!(Player { Idle, Walk });

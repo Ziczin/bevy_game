@@ -2,13 +2,30 @@
 use bevy::prelude::*;
 use crate::core::config::FromTomlValue;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AnimationMode {
+    Once,
+    Loop,
+    PingPong,
+}
+
+impl FromTomlValue for AnimationMode {
+    fn from_toml_value(value: &toml::Value) -> Self {
+        match value.as_str().unwrap_or_else(|| panic!("Expected string for AnimationMode, got {:?}", value)) {
+            "once" => AnimationMode::Once,
+            "loop" => AnimationMode::Loop,
+            "ping_pong" => AnimationMode::PingPong,
+            other => panic!("Unknown AnimationMode: '{}'. Expected 'once', 'loop', or 'ping_pong'", other),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct AnimationConfig {
     pub name: String,
     pub frames: Vec<usize>,
     pub duration_ms: u64,
-    pub loop_: bool,
-    pub ping_pong: bool,
+    pub mode: AnimationMode,
 }
 
 impl FromTomlValue for AnimationConfig {
@@ -18,8 +35,7 @@ impl FromTomlValue for AnimationConfig {
             name: table.get("name").and_then(|v| v.as_str()).unwrap_or_else(|| panic!("Missing 'name' in AnimationConfig")).to_string(),
             frames: table.get("frames").map(|v| Vec::<usize>::from_toml_value(v)).unwrap_or_else(|| panic!("Missing 'frames' in AnimationConfig")),
             duration_ms: table.get("duration_ms").and_then(|v| v.as_integer()).unwrap_or_else(|| panic!("Missing 'duration_ms' in AnimationConfig")) as u64,
-            loop_: table.get("loop").and_then(|v| v.as_bool()).unwrap_or_else(|| panic!("Missing 'loop' in AnimationConfig")),
-            ping_pong: table.get("ping_pong").and_then(|v| v.as_bool()).unwrap_or(false),
+            mode: table.get("mode").map(|v| AnimationMode::from_toml_value(v)).unwrap_or(AnimationMode::Once),
         }
     }
 }
@@ -47,10 +63,6 @@ pub struct SpriteSheetConfig {
     pub path: String,
     pub columns: usize,
     pub rows: usize,
-    pub image_width: u32,
-    pub image_height: u32,
-    pub size_x: f32,
-    pub size_y: f32,
 }
 
 impl FromTomlValue for SpriteSheetConfig {
@@ -60,10 +72,6 @@ impl FromTomlValue for SpriteSheetConfig {
             path: table.get("path").and_then(|v| v.as_str()).unwrap_or_else(|| panic!("Missing 'path' in SpriteSheetConfig")).to_string(),
             columns: table.get("columns").and_then(|v| v.as_integer()).unwrap_or_else(|| panic!("Missing 'columns' in SpriteSheetConfig")) as usize,
             rows: table.get("rows").and_then(|v| v.as_integer()).unwrap_or_else(|| panic!("Missing 'rows' in SpriteSheetConfig")) as usize,
-            image_width: table.get("image_width").and_then(|v| v.as_integer()).unwrap_or_else(|| panic!("Missing 'image_width' in SpriteSheetConfig")) as u32,
-            image_height: table.get("image_height").and_then(|v| v.as_integer()).unwrap_or_else(|| panic!("Missing 'image_height' in SpriteSheetConfig")) as u32,
-            size_x: table.get("size_x").and_then(|v| v.as_float()).unwrap_or_else(|| panic!("Missing 'size_x' in SpriteSheetConfig")) as f32,
-            size_y: table.get("size_y").and_then(|v| v.as_float()).unwrap_or_else(|| panic!("Missing 'size_y' in SpriteSheetConfig")) as f32,
         }
     }
 }

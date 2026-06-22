@@ -9,6 +9,7 @@ use crate::core::extensions::EntityBuilderExt;
 use crate::core::make_spritesheet;
 use crate::core::animation::create_animation;
 use crate::core::debug_log::DebugLogBuffer;
+use crate::core::config::from_toml;
 use crate::entities::red_slime::state::RedSlimeLogicFlags;
 use super::state::{
     RedSlimeAnimation, RedSlimeStateHandler, MovingDirection,
@@ -16,6 +17,10 @@ use super::state::{
     SPRITE_SIZE_MULTIPLIER_Y, COLLIDER_PADDING, COLLIDER_OFFSET_X, COLLIDER_OFFSET_Y,
     SPRITESHEET, ANIMATIONS,
 };
+
+from_toml!("config/global.toml", [
+    TILE_SIZE: f32 = "display.tile_size",
+]);
 
 pub fn spawn_single_red_slime(
     commands: &mut Commands,
@@ -71,11 +76,10 @@ pub fn summon(
     debug_log.add("🎬 RedSlime summon started");
 
     let ss = &*SPRITESHEET;
+    let tile_size = *TILE_SIZE;
     let (spritesheet, sprite_template) = make_spritesheet(
         &asset_server, &mut atlas_layouts,
-        ss.path.clone(), ss.columns, ss.rows,
-        ss.image_width, ss.image_height,
-        ss.size_x, ss.size_y
+        ss.path.clone(), ss.columns, ss.rows, tile_size
     );
 
     let anim_configs = &*ANIMATIONS;

@@ -1,0 +1,93 @@
+// src/modules/health/components.rs
+use bevy::prelude::*;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[repr(u8)]
+pub enum DamageType {
+    Physical = 0,
+    Magical = 1,
+}
+
+impl DamageType {
+    pub const COUNT: usize = 2;
+    
+    pub fn index(&self) -> usize {
+        *self as usize
+    }
+}
+
+#[derive(Component, Debug)]
+pub struct Health {
+    pub current: f32,
+    pub max: f32,
+}
+
+impl Health {
+    pub fn new(max: f32) -> Self {
+        Self { current: max, max }
+    }
+    
+    pub fn ratio(&self) -> f32 {
+        (self.current / self.max).clamp(0.0, 1.0)
+    }
+}
+
+#[derive(Component, Debug)]
+pub struct Resistances {
+    values: [f32; DamageType::COUNT],
+}
+
+impl Resistances {
+    pub fn new() -> Self {
+        Self {
+            values: [0.0; DamageType::COUNT],
+        }
+    }
+    
+    pub fn set(&mut self, damage_type: DamageType, resistance: f32) {
+        self.values[damage_type.index()] = resistance.clamp(0.0, 1.0);
+    }
+    
+    pub fn get(&self, damage_type: DamageType) -> f32 {
+        self.values[damage_type.index()]
+    }
+    
+    pub fn average_resistance(&self, damage_types: &[DamageType]) -> f32 {
+        if damage_types.is_empty() {
+            return 0.0;
+        }
+        
+        let total: f32 = damage_types.iter()
+            .map(|dt| self.get(*dt))
+            .sum();
+        
+        total / damage_types.len() as f32
+    }
+}
+
+impl Default for Resistances {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Component, Debug)]
+pub struct HealthBar {
+    pub owner: Entity,
+    pub background_entity: Entity,
+    pub current_hp_entity: Entity,
+    pub delayed_entity: Entity,
+    pub delayed_hp: f32,
+    pub target_delayed_hp: f32,
+    pub delay_timer: f32,
+    pub animation_timer: f32,
+    pub visibility_timer: f32,
+    pub is_visible: bool,
+}
+
+#[derive(Message, Debug)]
+pub struct DamageEvent {
+    pub target: Entity,
+    pub amount: f32,
+    pub damage_types: Vec<DamageType>,
+}

@@ -6,7 +6,6 @@ use crate::components::core::{DepthLayer, GameLayer};
 use crate::core::{make_spritesheet, extensions::EntityBuilderExt};
 use super::state::{
     FENCE_TEXTURE_PATH, FENCE_ATLAS_COLS, FENCE_ATLAS_ROWS,
-    FENCE_IMAGE_WIDTH, FENCE_IMAGE_HEIGHT, FENCE_SPRITE_SIZE_X, FENCE_SPRITE_SIZE_Y,
     FENCE_COLLIDER_WIDTH, FENCE_COLLIDER_HEIGHT, FENCE_COLLIDER_OFFSET_X, FENCE_COLLIDER_OFFSET_Y,
     FENCES, TILE_SIZE,
 };
@@ -16,15 +15,14 @@ pub fn spawn_fences(
     mut commands: Commands,
     mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
+    let tile_size = *TILE_SIZE;
+
     let (_spritesheet, sprite_template) = make_spritesheet(
         &asset_server, &mut atlas_layouts,
         FENCE_TEXTURE_PATH.to_string(),
         *FENCE_ATLAS_COLS, *FENCE_ATLAS_ROWS,
-        *FENCE_IMAGE_WIDTH, *FENCE_IMAGE_HEIGHT,
-        *FENCE_SPRITE_SIZE_X, *FENCE_SPRITE_SIZE_Y
+        tile_size
     );
-
-    let tile_size = *TILE_SIZE;
 
     for fence in FENCES.iter() {
         let mut sprite = sprite_template.clone();

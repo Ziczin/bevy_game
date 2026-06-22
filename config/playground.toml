@@ -1,6 +1,5 @@
 # config/playground.toml
 [tile]
-size = 16.0
 grid_width = 128
 grid_height = 128
 
@@ -9,8 +8,6 @@ atlas_cols = 4
 atlas_rows = 4
 image_width = 64
 image_height = 64
-sprite_size_x = 16.0
-sprite_size_y = 16.0
 collider_width = 14
 collider_height = 1
 collider_offset_x = 0
@@ -38,4 +35,3 @@ fences = [
 [path]
 atlas_cols = 12
 atlas_rows = 4
-tile_size = 16.0

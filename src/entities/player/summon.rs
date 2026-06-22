@@ -6,14 +6,21 @@ use crate::components::core::GameLayer;
 use crate::core::{make_spritesheet, extensions::EntityBuilderExt, animation::create_animation};
 use crate::components::{markers::Player, behavior::FollowPlayer, core::DepthLayer};
 use crate::core::debug_log::DebugLogBuffer;
+use crate::core::config::from_toml;
 use crate::entities::player::state::MovingDirection;
+use crate::modules::health::{Health, Resistances, DamageType, spawn_health_bar};
 
 use super::state::{
-    PlayerAnimation, PlayerStateHandler, CAMERA_FOLLOW_SMOOTHNESS,
+    PlayerAnimation, PlayerStateHandler, CAMERA_FOLLOW_SMOOTHNESS, TILE_SIZE,
     PLAYER_COLLIDER_HALF_WIDTH, PLAYER_COLLIDER_HALF_HEIGHT,
     PLAYER_COLLIDER_OFFSET_X, PLAYER_COLLIDER_OFFSET_Y,
     PlayerLogicFlags, SPRITESHEET, ANIMATIONS
 };
+
+from_toml!("config/player.toml", [
+    DEFAULT_HEALTH_MAX: f32 = "health.max",
+    DEFAULT_MAGICAL_RESISTANCE: f32 = "health.magical_resistance",
+]);
 
 pub fn summon(
     asset_server: Res<AssetServer>,
@@ -31,11 +38,10 @@ pub fn summon(
     ));
 
     let ss = &*SPRITESHEET;
+    let tile_size = *TILE_SIZE;
     let (spritesheet, sprite) = make_spritesheet(
         &asset_server, &mut atlas_layouts,
-        ss.path.clone(), ss.columns, ss.rows,
-        ss.image_width, ss.image_height,
-        ss.size_x, ss.size_y
+        ss.path.clone(), ss.columns, ss.rows, tile_size
     );
 
     let anim_configs = &*ANIMATIONS;
@@ -45,7 +51,10 @@ pub fn summon(
     let walk_handler = create_animation(&spritesheet, &mut animations, walk_config);
     let idle_handler = create_animation(&spritesheet, &mut animations, idle_config);
 
-    commands.spawn((
+    let mut resistances = Resistances::new();
+    resistances.set(DamageType::Magical, *DEFAULT_MAGICAL_RESISTANCE);
+
+    let player_entity = commands.spawn((
         sprite,
         SpritesheetAnimation::new(idle_handler.clone()),
         PlayerAnimation { idle: idle_handler, walk: walk_handler },
@@ -53,6 +62,8 @@ pub fn summon(
         Player,
         PlayerLogicFlags::default(),
         MovingDirection::default(),
+        Health::new(*DEFAULT_HEALTH_MAX),
+        resistances,
     ))
     .at(0, 0, DepthLayer::Entities(0))
     .as_dynamic_body()
@@ -64,7 +75,10 @@ pub fn summon(
         *PLAYER_COLLIDER_OFFSET_Y,
         GameLayer::DynamicBody,
         [GameLayer::World, GameLayer::DynamicBody],
-    );
+    )
+    .id();
+    
+    spawn_health_bar(&mut commands, player_entity);
     
     debug_log.add("✅ Player spawned");
 }
