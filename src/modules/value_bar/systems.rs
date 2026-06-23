@@ -119,6 +119,10 @@ pub fn update_value_bar_visuals(
     mut sprites: Query<(&mut Sprite, &mut Transform)>,
 ) {
     for bar in &mut bars {
+        if !bar.is_visible {
+            continue;
+        }
+
         let current_ratio = bar.value.clamp(0.0, 1.0);
         let bar_width = bar.width;
         let bar_height = bar.height;

@@ -17,6 +17,6 @@ impl Plugin for ValueBarPlugin {
             update_delayed_value,
             update_value_bar_visuals,
             update_value_bar_visibility,
-        ));
+        ).chain());
     }
 }
