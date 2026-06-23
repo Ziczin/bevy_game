@@ -8,6 +8,10 @@ pub fn spawn_value_bar(
     owner: Entity,
     config: ValueBarConfig,
 ) -> Entity {
+    let padding = config.background_padding;
+    let bg_width = config.width + padding * 2.0;
+    let bg_height = config.height + padding * 2.0;
+
     let background_entity = commands.spawn((
         Sprite {
             color: Color::srgba(
@@ -16,7 +20,7 @@ pub fn spawn_value_bar(
                 config.colors.background.z,
                 config.colors.background.w,
             ),
-            custom_size: Some(Vec2::new(config.width, config.height)),
+            custom_size: Some(Vec2::new(bg_width, bg_height)),
             ..default()
         },
         Transform::from_xyz(config.offset_x, config.offset_y, 0.0),
@@ -71,6 +75,7 @@ pub fn spawn_value_bar(
         height: config.height,
         offset_x: config.offset_x,
         offset_y: config.offset_y,
+        background_padding: config.background_padding,
         background_color: config.colors.background,
         current_color: config.colors.current,
         delayed_damage_color: config.colors.delayed_damage,
@@ -118,9 +123,10 @@ pub fn update_value_bar_visuals(
         let bar_width = bar.width;
         let bar_height = bar.height;
         let bar_left = bar.offset_x - bar_width / 2.0;
+        let padding = bar.background_padding;
 
         if let Ok((mut bg_sprite, mut bg_transform)) = sprites.get_mut(bar.background_entity) {
-            bg_sprite.custom_size = Some(Vec2::new(bar_width, bar_height));
+            bg_sprite.custom_size = Some(Vec2::new(bar_width + padding * 2.0, bar_height + padding * 2.0));
             bg_sprite.color = Color::srgba(
                 bar.background_color.x,
                 bar.background_color.y,

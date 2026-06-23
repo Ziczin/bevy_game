@@ -15,6 +15,8 @@ from_toml!("config/player.toml", [
     PLAYER_COLLIDER_OFFSET_Y: i32 = "collider.offset_y",
     SPRITESHEET: SpriteSheetConfig = "spritesheet",
     ANIMATIONS: Vec<AnimationConfig> = "animations",
+    HEALTH_BAR_OFFSET_Y: f32 = "health.bar_offset_y",
+    MANA_BAR_OFFSET_Y: f32 = "mana.bar_offset_y",
 ]);
 
 from_toml!("config/global/display.toml", [

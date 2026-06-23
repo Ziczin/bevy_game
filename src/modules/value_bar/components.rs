@@ -1,4 +1,3 @@
-// FILE: src/modules/value_bar/components.rs
 use bevy::prelude::*;
 
 #[derive(Component, Debug)]
@@ -18,6 +17,7 @@ pub struct ValueBar {
     pub height: f32,
     pub offset_x: f32,
     pub offset_y: f32,
+    pub background_padding: f32,
     pub background_color: Vec4,
     pub current_color: Vec4,
     pub delayed_damage_color: Vec4,

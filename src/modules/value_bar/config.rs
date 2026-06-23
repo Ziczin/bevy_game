@@ -6,6 +6,7 @@ from_toml!("config/ui/value_bar.toml", [
     DEFAULT_HEIGHT: f32 = "default.height",
     DEFAULT_OFFSET_X: f32 = "default.offset_x",
     DEFAULT_OFFSET_Y: f32 = "default.offset_y",
+    BACKGROUND_PADDING: f32 = "default.background_padding",
     COLOR_BACKGROUND: Vec4 = "colors.background",
     COLOR_CURRENT_HP: Vec4 = "colors.current_hp",
     COLOR_DELAYED_DAMAGE: Vec4 = "colors.delayed_damage",
@@ -42,6 +43,7 @@ pub struct ValueBarConfig {
     pub height: f32,
     pub offset_x: f32,
     pub offset_y: f32,
+    pub background_padding: f32,
     pub colors: ValueBarColors,
 }
 
@@ -52,6 +54,7 @@ impl Default for ValueBarConfig {
             height: *DEFAULT_HEIGHT,
             offset_x: *DEFAULT_OFFSET_X,
             offset_y: *DEFAULT_OFFSET_Y,
+            background_padding: *BACKGROUND_PADDING,
             colors: ValueBarColors::default(),
         }
     }
@@ -75,6 +78,11 @@ impl ValueBarConfig {
     pub fn with_offset(mut self, x: f32, y: f32) -> Self {
         self.offset_x = x;
         self.offset_y = y;
+        self
+    }
+
+    pub fn with_background_padding(mut self, padding: f32) -> Self {
+        self.background_padding = padding;
         self
     }
 

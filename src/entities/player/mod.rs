@@ -10,6 +10,7 @@ mod health_input;
 
 use crate::modules::health::{Health, Mana};
 use crate::modules::value_bar::ValueBar;
+use self::state::{HEALTH_BAR_OFFSET_Y, MANA_BAR_OFFSET_Y};
 
 pub struct PlayerPlugin;
 
@@ -38,7 +39,7 @@ fn sync_health_to_bar(
     let Ok(health) = health_query.get(player_entity) else { return };
 
     for mut bar in &mut value_bars {
-        if bar.owner == player_entity && bar.offset_y == 10.0 {
+        if bar.owner == player_entity && bar.offset_y == *HEALTH_BAR_OFFSET_Y {
             bar.value = health.ratio();
         }
     }
@@ -53,7 +54,7 @@ fn sync_mana_to_bar(
     let Ok(mana) = mana_query.get(player_entity) else { return };
 
     for mut bar in &mut value_bars {
-        if bar.owner == player_entity && bar.offset_y == 14.0 {
+        if bar.owner == player_entity && bar.offset_y == *MANA_BAR_OFFSET_Y {
             bar.value = mana.ratio();
         }
     }
