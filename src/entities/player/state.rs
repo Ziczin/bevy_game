@@ -1,4 +1,4 @@
-// src/entities/player/state.rs
+// FILE: src/entities/player/state.rs
 use crate::core::config::from_toml;
 use crate::core::dto::{AnimationConfig, SpriteSheetConfig};
 use crate::core::macros::bevy_alias::component_from_type;

@@ -1,0 +1,17 @@
+[default]
+width = 16.0
+height = 2.0
+offset_x = 0.0
+offset_y = 10.0
+
+[colors]
+background = [0.5, 0.5, 0.5, 1.0]
+current_hp = [1.0, 0.0, 0.0, 1.0]
+delayed_damage = [1.0, 1.0, 0.0, 1.0]
+delayed_heal = [0.0, 0.5, 0.0, 1.0]
+
+[timing]
+delay_before_animation = 0.5
+animation_duration = 0.5
+visibility_timeout = 3.0
+fade_duration = 0.5

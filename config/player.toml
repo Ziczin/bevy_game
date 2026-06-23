@@ -1,4 +1,4 @@
-# config/player.toml
+# FILE: config/player.toml
 [moving]
 speed = 60.0
 
@@ -13,6 +13,14 @@ max = 100.0
 magical_resistance = 0.5
 heal_amount = 20.0
 damage_amount = 20.0
+
+[mana]
+max = 100.0
+bar_offset_y = 14.0
+bar_color_background = [0.5, 0.5, 0.5, 1.0]
+bar_color_current = [0.0, 0.0, 1.0, 1.0]
+bar_color_delayed_damage = [0.5, 0.5, 1.0, 1.0]
+bar_color_delayed_heal = [0.0, 0.5, 1.0, 1.0]
 
 [spritesheet]
 path = "textures/player/player_tilemap.png"

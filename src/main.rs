@@ -1,3 +1,4 @@
+// FILE: src/main.rs
 mod components;
 mod systems;
 mod entities;
@@ -37,6 +38,7 @@ fn main() {
             entities::Playground,
         ))
         .add_plugins(modules::health::HealthModulePlugin)
+        .add_plugins(modules::value_bar::ValueBarPlugin)
         .insert_resource(Gravity::ZERO)
         .insert_resource(core::navigation::NavigationVisualSettings { enabled: DEBUG_NAVMESH })
         .insert_resource(core::debug_log::DebugLogBuffer {
@@ -60,7 +62,7 @@ fn main() {
             systems::movement::lerp_follow::lerp_follow_to_player,
             core::debug_log::flush_debug_logs,
             exit_on_escape,
-            
+
         ));
     if DEBUG_HITBOXS {
         app.add_plugins(PhysicsDebugPlugin::default());

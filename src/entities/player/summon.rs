@@ -1,4 +1,4 @@
-// src/entities/player/summon.rs
+// FILE: src/entities/player/summon.rs
 use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 
@@ -8,7 +8,8 @@ use crate::components::{markers::Player, behavior::FollowPlayer, core::DepthLaye
 use crate::core::debug_log::DebugLogBuffer;
 use crate::core::config::from_toml;
 use crate::entities::player::state::MovingDirection;
-use crate::modules::health::{Health, Resistances, DamageType, spawn_health_bar};
+use crate::modules::health::{Health, Mana, Resistances, DamageType};
+use crate::modules::value_bar::{spawn_value_bar, ValueBarConfig, ValueBarColors};
 
 use super::state::{
     PlayerAnimation, PlayerStateHandler, CAMERA_FOLLOW_SMOOTHNESS, TILE_SIZE,
@@ -20,6 +21,12 @@ use super::state::{
 from_toml!("config/player.toml", [
     DEFAULT_HEALTH_MAX: f32 = "health.max",
     DEFAULT_MAGICAL_RESISTANCE: f32 = "health.magical_resistance",
+    DEFAULT_MANA_MAX: f32 = "mana.max",
+    MANA_BAR_OFFSET_Y: f32 = "mana.bar_offset_y",
+    MANA_BAR_COLOR_BACKGROUND: Vec4 = "mana.bar_color_background",
+    MANA_BAR_COLOR_CURRENT: Vec4 = "mana.bar_color_current",
+    MANA_BAR_COLOR_DELAYED_DAMAGE: Vec4 = "mana.bar_color_delayed_damage",
+    MANA_BAR_COLOR_DELAYED_HEAL: Vec4 = "mana.bar_color_delayed_heal",
 ]);
 
 pub fn summon(
@@ -30,7 +37,7 @@ pub fn summon(
     mut debug_log: ResMut<DebugLogBuffer>,
 ) {
     debug_log.add("🎬 Player summon started");
-    
+
     commands.spawn((
         Camera2d,
         Msaa::Off,
@@ -47,7 +54,7 @@ pub fn summon(
     let anim_configs = &*ANIMATIONS;
     let walk_config = anim_configs.iter().find(|c| c.name == "walk").expect("Missing 'walk' animation");
     let idle_config = anim_configs.iter().find(|c| c.name == "idle").expect("Missing 'idle' animation");
-    
+
     let walk_handler = create_animation(&spritesheet, &mut animations, walk_config);
     let idle_handler = create_animation(&spritesheet, &mut animations, idle_config);
 
@@ -63,6 +70,7 @@ pub fn summon(
         PlayerLogicFlags::default(),
         MovingDirection::default(),
         Health::new(*DEFAULT_HEALTH_MAX),
+        Mana::new(*DEFAULT_MANA_MAX),
         resistances,
     ))
     .at(0, 0, DepthLayer::Entities(0))
@@ -77,8 +85,24 @@ pub fn summon(
         [GameLayer::World, GameLayer::DynamicBody],
     )
     .id();
-    
-    spawn_health_bar(&mut commands, player_entity);
-    
+
+    let health_bar_config = ValueBarConfig::new()
+        .with_offset(0.0, 10.0);
+
+    spawn_value_bar(&mut commands, player_entity, health_bar_config);
+
+    let mana_colors = ValueBarColors {
+        background: *MANA_BAR_COLOR_BACKGROUND,
+        current: *MANA_BAR_COLOR_CURRENT,
+        delayed_damage: *MANA_BAR_COLOR_DELAYED_DAMAGE,
+        delayed_heal: *MANA_BAR_COLOR_DELAYED_HEAL,
+    };
+
+    let mana_bar_config = ValueBarConfig::new()
+        .with_offset(0.0, *MANA_BAR_OFFSET_Y)
+        .with_colors(mana_colors);
+
+    spawn_value_bar(&mut commands, player_entity, mana_bar_config);
+
     debug_log.add("✅ Player spawned");
 }
