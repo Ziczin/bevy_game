@@ -1,10 +1,13 @@
-// src/entities/playground/state.rs
+// FILE: src/entities/playground/state.rs
 use crate::core::config::from_toml;
 use crate::core::dto::FenceSegment;
 
 from_toml!("config/playground.toml", [
     GRID_WIDTH: usize = "tile.grid_width",
     GRID_HEIGHT: usize = "tile.grid_height",
+    ROTATION_SEED_X: i32 = "tile.rotation_seed_x",
+    ROTATION_SEED_Y: i32 = "tile.rotation_seed_y",
+    ROTATION_VARIANTS: i32 = "tile.rotation_variants",
     FENCE_ATLAS_COLS: usize = "fence.atlas_cols",
     FENCE_ATLAS_ROWS: usize = "fence.atlas_rows",
     FENCE_COLLIDER_WIDTH: i32 = "fence.collider_width",
@@ -14,9 +17,11 @@ from_toml!("config/playground.toml", [
     FENCES: Vec<FenceSegment> = "fence.fences",
     PATH_ATLAS_COLS: usize = "path.atlas_cols",
     PATH_ATLAS_ROWS: usize = "path.atlas_rows",
+    PATTERN_OFFSET_X: i32 = "path.pattern_offset_x",
+    PATTERN_OFFSET_Y: i32 = "path.pattern_offset_y",
 ]);
 
-from_toml!("config/global.toml", [
+from_toml!("config/global/display.toml", [
     TILE_SIZE: f32 = "display.tile_size",
 ]);
 

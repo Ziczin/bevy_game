@@ -9,6 +9,7 @@ background = [0.5, 0.5, 0.5, 1.0]
 current_hp = [1.0, 0.0, 0.0, 1.0]
 delayed_damage = [1.0, 1.0, 0.0, 1.0]
 delayed_heal = [0.0, 0.5, 0.0, 1.0]
+transparent = [0.0, 0.0, 0.0, 0.0]
 
 [timing]
 delay_before_animation = 0.5

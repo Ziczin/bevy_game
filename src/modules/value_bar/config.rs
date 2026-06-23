@@ -1,8 +1,7 @@
-// FILE: src/modules/value_bar/config.rs
 use bevy::math::Vec4;
 use crate::core::config::from_toml;
 
-from_toml!("config/default/value_bar.toml", [
+from_toml!("config/ui/value_bar.toml", [
     DEFAULT_WIDTH: f32 = "default.width",
     DEFAULT_HEIGHT: f32 = "default.height",
     DEFAULT_OFFSET_X: f32 = "default.offset_x",
@@ -11,6 +10,7 @@ from_toml!("config/default/value_bar.toml", [
     COLOR_CURRENT_HP: Vec4 = "colors.current_hp",
     COLOR_DELAYED_DAMAGE: Vec4 = "colors.delayed_damage",
     COLOR_DELAYED_HEAL: Vec4 = "colors.delayed_heal",
+    COLOR_TRANSPARENT: Vec4 = "colors.transparent",
     DELAY_BEFORE_ANIMATION: f32 = "timing.delay_before_animation",
     ANIMATION_DURATION: f32 = "timing.animation_duration",
     VISIBILITY_TIMEOUT: f32 = "timing.visibility_timeout",
@@ -22,6 +22,7 @@ pub struct ValueBarColors {
     pub current: Vec4,
     pub delayed_damage: Vec4,
     pub delayed_heal: Vec4,
+    pub transparent: Vec4,
 }
 
 impl Default for ValueBarColors {
@@ -31,6 +32,7 @@ impl Default for ValueBarColors {
             current: *COLOR_CURRENT_HP,
             delayed_damage: *COLOR_DELAYED_DAMAGE,
             delayed_heal: *COLOR_DELAYED_HEAL,
+            transparent: *COLOR_TRANSPARENT,
         }
     }
 }

@@ -17,7 +17,7 @@ from_toml!("config/player.toml", [
     ANIMATIONS: Vec<AnimationConfig> = "animations",
 ]);
 
-from_toml!("config/global.toml", [
+from_toml!("config/global/display.toml", [
     CAMERA_FOLLOW_SMOOTHNESS: f32 = "camera.follow_smoothness",
     TILE_SIZE: f32 = "display.tile_size",
 ]);

@@ -1,0 +1,23 @@
+[colors]
+grid_walkable = [1.0, 0.5, 0.5, 0.5]
+grid_blocked = [1.0, 0.0, 0.0, 0.9]
+path_point = [1.0, 1.0, 0.0, 0.8]
+path_line = [1.0, 1.0, 0.0, 0.5]
+agent_center = [0.8, 0.0, 0.8, 1.0]
+agent_outline = [0.8, 0.0, 0.8, 0.5]
+
+[sizes]
+grid_walkable = 1.0
+grid_blocked = 2.0
+path_point = 1.0
+path_line_thickness = 1.0
+agent_center = 2.0
+agent_outline_thickness = 1.0
+
+[other]
+agent_outline_segments = 16
+
+[layers]
+nav_grid_ui_offset = -10
+nav_path_ui_offset = -9
+agent_center_ui_offset = -8

@@ -1,0 +1,23 @@
+[display]
+window_width = 1920
+window_height = 1080
+scale_factor_override = 4.0
+tile_size = 16.0
+
+[camera]
+follow_smoothness = 0.99
+
+[gizmos]
+aabb_color = [1.0, 1.0, 1.0, 1.0]
+collider_color = [1.0, 1.0, 0.0, 1.0]
+
+[depth_layers]
+always_bottom = -800.0
+background = -600.0
+ground = -400.0
+environment = -200.0
+entities = 0.0
+effects = 200.0
+foreground = 400.0
+ui = 600.0
+always_top = 800.0

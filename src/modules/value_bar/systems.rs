@@ -1,8 +1,7 @@
-// FILE: src/modules/value_bar/systems.rs
 use bevy::prelude::*;
 use crate::components::core::DepthLayer;
 use super::components::ValueBar;
-use super::config::{ValueBarConfig, DELAY_BEFORE_ANIMATION, ANIMATION_DURATION, VISIBILITY_TIMEOUT, FADE_DURATION};
+use super::config::{ValueBarConfig, DELAY_BEFORE_ANIMATION, ANIMATION_DURATION, VISIBILITY_TIMEOUT, FADE_DURATION, COLOR_TRANSPARENT};
 
 pub fn spawn_value_bar(
     commands: &mut Commands,
@@ -218,7 +217,12 @@ pub fn update_value_bar_visibility(
 
             for entity in [bar.background_entity, bar.current_entity, bar.delayed_entity] {
                 if let Ok(mut sprite) = sprites.get_mut(entity) {
-                    sprite.color = Color::srgba(0.0, 0.0, 0.0, 0.0);
+                    sprite.color = Color::srgba(
+                        COLOR_TRANSPARENT.x,
+                        COLOR_TRANSPARENT.y,
+                        COLOR_TRANSPARENT.z,
+                        COLOR_TRANSPARENT.w,
+                    );
                 }
             }
         }

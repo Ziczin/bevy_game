@@ -1,8 +1,7 @@
-// src/entities/red_slime/state.rs
 use bevy::math::Vec2;
 use bevy::prelude::Component;
 
-use crate::core::config::from_toml;
+use crate::core::config::{from_toml, FromTomlValue};
 use crate::core::dto::{AnimationConfig, SpriteSheetConfig};
 use crate::core::macros::bevy_custom::animation_states;
 use crate::core::macros::state_machine::behavior_states;
@@ -22,6 +21,7 @@ from_toml!("config/red_slime.toml", [
     EXPECTED_IDLE_FRAME: usize = "collider.expected_idle_frame",
     SPRITESHEET: SpriteSheetConfig = "spritesheet",
     ANIMATIONS: Vec<AnimationConfig> = "animations",
+    SPAWN_POINTS: Vec<SpawnPoint> = "spawn_points",
 ]);
 
 behavior_states!(RedSlime { Idle, Walk });
@@ -33,5 +33,21 @@ bitflags::bitflags! {
     #[derive(Component, Clone, Copy, PartialEq, Default)]
     pub struct RedSlimeLogicFlags: u8 {
         const CanMove = 1 << 0;
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct SpawnPoint {
+    pub x: i32,
+    pub y: i32,
+}
+
+impl FromTomlValue for SpawnPoint {
+    fn from_toml_value(value: &toml::Value) -> Self {
+        let table = value.as_table().unwrap_or_else(|| panic!("Expected table for SpawnPoint, got {:?}", value));
+        Self {
+            x: table.get("x").and_then(|v| v.as_integer()).unwrap_or_else(|| panic!("Missing 'x' in SpawnPoint")) as i32,
+            y: table.get("y").and_then(|v| v.as_integer()).unwrap_or_else(|| panic!("Missing 'y' in SpawnPoint")) as i32,
+        }
     }
 }

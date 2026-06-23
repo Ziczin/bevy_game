@@ -53,7 +53,7 @@ pub fn visualize_nav_grid(
         commands.entity(entity).despawn();
     }
 
-    let layer = NAV_GRID_UI_LAYER;
+    let layer = *NAV_GRID_UI_LAYER;
     let z = layer.depth_value();
 
     for y in 0..grid.height {
@@ -61,9 +61,9 @@ pub fn visualize_nav_grid(
             if let Some((walkable, _visible)) = grid.get_cell(x, y) {
                 let world_pos = grid.grid_to_world(x, y);
                 let (color, size) = if walkable {
-                    (GRID_WALKABLE_COLOR, GRID_WALKABLE_SIZE)
+                    (*GRID_WALKABLE_COLOR, *GRID_WALKABLE_SIZE)
                 } else {
-                    (GRID_BLOCKED_COLOR, GRID_BLOCKED_SIZE)
+                    (*GRID_BLOCKED_COLOR, *GRID_BLOCKED_SIZE)
                 };
 
                 commands.spawn((
@@ -95,15 +95,15 @@ pub fn visualize_nav_path(
         commands.entity(entity).despawn();
     }
 
-    let layer = NAV_PATH_UI_LAYER;
+    let layer = *NAV_PATH_UI_LAYER;
     let z = layer.depth_value();
 
     for pathfinder in &pathfinder_query {
         for waypoint in &pathfinder.path {
             commands.spawn((
                 Sprite {
-                    color: PATH_POINT_COLOR,
-                    custom_size: Some(Vec2::splat(PATH_POINT_SIZE)),
+                    color: *PATH_POINT_COLOR,
+                    custom_size: Some(Vec2::splat(*PATH_POINT_SIZE)),
                     ..default()
                 },
                 Transform::from_xyz(waypoint.x, waypoint.y, z),
@@ -123,8 +123,8 @@ pub fn visualize_nav_path(
 
                 commands.spawn((
                     Sprite {
-                        color: PATH_LINE_COLOR,
-                        custom_size: Some(Vec2::new(length, PATH_LINE_THICKNESS)),
+                        color: *PATH_LINE_COLOR,
+                        custom_size: Some(Vec2::new(length, *PATH_LINE_THICKNESS)),
                         ..default()
                     },
                     Transform::from_xyz(mid.x, mid.y, z)
@@ -152,7 +152,7 @@ pub fn visualize_agent_centers(
         commands.entity(entity).despawn();
     }
 
-    let layer = AGENT_CENTER_UI_LAYER;
+    let layer = *AGENT_CENTER_UI_LAYER;
     let z = layer.depth_value();
 
     for (_entity, transform, children, pathfinder) in &pathfinder_query {
@@ -160,8 +160,8 @@ pub fn visualize_agent_centers(
         
         commands.spawn((
             Sprite {
-                color: AGENT_CENTER_COLOR,
-                custom_size: Some(Vec2::splat(AGENT_CENTER_SIZE)),
+                color: *AGENT_CENTER_COLOR,
+                custom_size: Some(Vec2::splat(*AGENT_CENTER_SIZE)),
                 ..default()
             },
             Transform::from_xyz(center_pos.x, center_pos.y, z),
@@ -170,10 +170,11 @@ pub fn visualize_agent_centers(
         ));
 
         let half_size = pathfinder.agent_half_size;
+        let segments = *AGENT_OUTLINE_SEGMENTS;
         
-        for i in 0..AGENT_OUTLINE_SEGMENTS {
-            let angle1 = (i as f32 / AGENT_OUTLINE_SEGMENTS as f32) * std::f32::consts::TAU;
-            let angle2 = ((i + 1) as f32 / AGENT_OUTLINE_SEGMENTS as f32) * std::f32::consts::TAU;
+        for i in 0..segments {
+            let angle1 = (i as f32 / segments as f32) * std::f32::consts::TAU;
+            let angle2 = ((i + 1) as f32 / segments as f32) * std::f32::consts::TAU;
             
             let x1 = center_pos.x + angle1.cos() * half_size.x;
             let y1 = center_pos.y + angle1.sin() * half_size.y;
@@ -188,8 +189,8 @@ pub fn visualize_agent_centers(
 
             commands.spawn((
                 Sprite {
-                    color: AGENT_OUTLINE_COLOR,
-                    custom_size: Some(Vec2::new(length, AGENT_OUTLINE_THICKNESS)),
+                    color: *AGENT_OUTLINE_COLOR,
+                    custom_size: Some(Vec2::new(length, *AGENT_OUTLINE_THICKNESS)),
                     ..default()
                 },
                 Transform::from_xyz(mid.x, mid.y, z)

@@ -1,12 +1,11 @@
-// src/entities/playground/spawn_ground.rs
 use bevy::prelude::*;
 
 use crate::components::markers::Tile;
 use crate::components::core::DepthLayer;
-use super::state::{TILE_SIZE, GRID_WIDTH, GRID_HEIGHT, TILE_TEXTURE_PATH};
+use super::state::{TILE_SIZE, GRID_WIDTH, GRID_HEIGHT, TILE_TEXTURE_PATH, ROTATION_SEED_X, ROTATION_SEED_Y, ROTATION_VARIANTS};
 
 fn get_tile_rotation(x: usize, y: usize) -> Quat {
-    let seed = ((x * 17 + y * 31) % 4) as f32;
+    let seed = ((x as i32 * *ROTATION_SEED_X + y as i32 * *ROTATION_SEED_Y) % *ROTATION_VARIANTS) as f32;
     Quat::from_rotation_z(seed * std::f32::consts::FRAC_PI_2)
 }
 

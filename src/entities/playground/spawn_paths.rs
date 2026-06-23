@@ -1,4 +1,3 @@
-// src/entities/playground/spawn_paths.rs
 use bevy::prelude::*;
 use std::collections::HashSet;
 
@@ -7,7 +6,7 @@ use crate::components::core::DepthLayer;
 use crate::core::blob_tilemap::get_blob_tile_index;
 use super::state::{
     PATH_TEXTURE_PATH, PATH_ATLAS_COLS, PATH_ATLAS_ROWS,
-    TILE_SIZE,
+    TILE_SIZE, PATTERN_OFFSET_X, PATTERN_OFFSET_Y,
 };
 
 const PATTERN: &[&str] = &[
@@ -34,9 +33,6 @@ const PATTERN: &[&str] = &[
     "#################",
 ];
 
-const PATTERN_OFFSET_X: i32 = -10;
-const PATTERN_OFFSET_Y: i32 = 20;
-
 #[inline]
 fn compute_moore_mask(x: i32, y: i32, tiles: &HashSet<(i32, i32)>) -> u8 {
     let mut mask = 0u8;
@@ -60,8 +56,8 @@ fn create_pattern_tiles() -> HashSet<(i32, i32)> {
         for (col, ch) in line.chars().enumerate() {
             if ch == '#' {
                 tiles.insert((
-                    PATTERN_OFFSET_X + col as i32,
-                    PATTERN_OFFSET_Y - row as i32,
+                    *PATTERN_OFFSET_X + col as i32,
+                    *PATTERN_OFFSET_Y - row as i32,
                 ));
             }
         }

@@ -1,6 +1,0 @@
-# config/global.toml
-[display]
-tile_size = 16.0
-
-[camera]
-follow_smoothness = 0.99

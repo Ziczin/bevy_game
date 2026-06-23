@@ -1,4 +1,3 @@
-# config/navigation.toml
 [grid]
 cell_size = 4.0
 width = 96

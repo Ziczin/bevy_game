@@ -1,4 +1,3 @@
-// FILE: src/entities/player/summon.rs
 use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 
@@ -22,6 +21,7 @@ from_toml!("config/player.toml", [
     DEFAULT_HEALTH_MAX: f32 = "health.max",
     DEFAULT_MAGICAL_RESISTANCE: f32 = "health.magical_resistance",
     DEFAULT_MANA_MAX: f32 = "mana.max",
+    HEALTH_BAR_OFFSET_Y: f32 = "health.bar_offset_y",
     MANA_BAR_OFFSET_Y: f32 = "mana.bar_offset_y",
     MANA_BAR_COLOR_BACKGROUND: Vec4 = "mana.bar_color_background",
     MANA_BAR_COLOR_CURRENT: Vec4 = "mana.bar_color_current",
@@ -87,7 +87,7 @@ pub fn summon(
     .id();
 
     let health_bar_config = ValueBarConfig::new()
-        .with_offset(0.0, 10.0);
+        .with_offset(0.0, *HEALTH_BAR_OFFSET_Y);
 
     spawn_value_bar(&mut commands, player_entity, health_bar_config);
 
@@ -96,6 +96,7 @@ pub fn summon(
         current: *MANA_BAR_COLOR_CURRENT,
         delayed_damage: *MANA_BAR_COLOR_DELAYED_DAMAGE,
         delayed_heal: *MANA_BAR_COLOR_DELAYED_HEAL,
+        transparent: [0.0, 0.0, 0.0, 0.0].into(), // Используем прозрачный цвет из конфига UI, но для маны можно оставить дефолтный или вынести отдельно
     };
 
     let mana_bar_config = ValueBarConfig::new()

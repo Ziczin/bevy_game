@@ -1,4 +1,3 @@
-// src/entities/red_slime/summon.rs
 use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 use avian2d::prelude::*;
@@ -15,10 +14,10 @@ use super::state::{
     RedSlimeAnimation, RedSlimeStateHandler, MovingDirection,
     WALK_DISTANCE_END, PATHFINDER_UPDATE_INTERVAL, SPRITE_SIZE_MULTIPLIER_X,
     SPRITE_SIZE_MULTIPLIER_Y, COLLIDER_PADDING, COLLIDER_OFFSET_X, COLLIDER_OFFSET_Y,
-    SPRITESHEET, ANIMATIONS,
+    SPRITESHEET, ANIMATIONS, SPAWN_POINTS,
 };
 
-from_toml!("config/global.toml", [
+from_toml!("config/global/display.toml", [
     TILE_SIZE: f32 = "display.tile_size",
 ]);
 
@@ -89,10 +88,9 @@ pub fn summon(
     let idle_handler = create_animation(&spritesheet, &mut animations, idle_config);
     let walk_handler = create_animation(&spritesheet, &mut animations, walk_config);
 
-    spawn_single_red_slime(&mut commands, 50, 0, &sprite_template, idle_handler.clone(), walk_handler.clone(), &mut debug_log, 1);
-    spawn_single_red_slime(&mut commands, -50, 25, &sprite_template, idle_handler.clone(), walk_handler.clone(), &mut debug_log, 1);
-    spawn_single_red_slime(&mut commands, 0, -38, &sprite_template, idle_handler.clone(), walk_handler.clone(), &mut debug_log, 1);
-    spawn_single_red_slime(&mut commands, 0, -62, &sprite_template, idle_handler.clone(), walk_handler.clone(), &mut debug_log, 1);
+    for point in SPAWN_POINTS.iter() {
+        spawn_single_red_slime(&mut commands, point.x, point.y, &sprite_template, idle_handler.clone(), walk_handler.clone(), &mut debug_log, 1);
+    }
 
     debug_log.add("✅ All RedSlimes spawned successfully");
 }

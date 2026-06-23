@@ -1,0 +1,4 @@
+[debug]
+message = true
+navmesh = false
+hitboxes = false

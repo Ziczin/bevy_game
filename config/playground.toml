@@ -1,7 +1,9 @@
-# config/playground.toml
 [tile]
 grid_width = 128
 grid_height = 128
+rotation_seed_x = 17
+rotation_seed_y = 31
+rotation_variants = 4
 
 [fence]
 atlas_cols = 4
@@ -35,3 +37,5 @@ fences = [
 [path]
 atlas_cols = 12
 atlas_rows = 4
+pattern_offset_x = -10
+pattern_offset_y = 20
