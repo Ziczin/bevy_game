@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 use crate::components::pathfinding::Pathfinder;
+use crate::core::profiling::{ProfilingBuffer, ProfileScope};
 use super::nav_grid::NavGrid;
 use super::state::{
     NavGridVisualMarker, NavPathVisualMarker, AgentCenterVisualMarker,
@@ -13,15 +14,11 @@ use super::state::{
     AGENT_CENTER_SIZE, AGENT_OUTLINE_THICKNESS, AGENT_OUTLINE_SEGMENTS,
 };
 
-#[derive(Resource)]
+#[derive(Resource, Default)]
 pub struct NavigationVisualSettings {
-    pub enabled: bool,
-}
-
-impl Default for NavigationVisualSettings {
-    fn default() -> Self {
-        Self { enabled: false }
-    }
+    pub points: bool,
+    pub paths: bool,
+    pub agents: bool,
 }
 
 fn get_collider_world_position(
@@ -42,8 +39,11 @@ pub fn visualize_nav_grid(
     grid: Option<Res<NavGrid>>,
     existing_visuals: Query<Entity, With<NavGridVisualMarker>>,
     settings: Res<NavigationVisualSettings>,
+    profiling: Res<ProfilingBuffer>,
 ) {
-    if !settings.enabled {
+    let _scope = ProfileScope::new(&profiling, "core::navigation::visualize::visualize_nav_grid", &["pathfinding", "navgrid", "debug", "visual"]);
+    
+    if !settings.points {
         return;
     }
 
@@ -86,8 +86,11 @@ pub fn visualize_nav_path(
     pathfinder_query: Query<&Pathfinder, Changed<Pathfinder>>,
     existing_paths: Query<Entity, With<NavPathVisualMarker>>,
     settings: Res<NavigationVisualSettings>,
+    profiling: Res<ProfilingBuffer>,
 ) {
-    if !settings.enabled {
+    let _scope = ProfileScope::new(&profiling, "core::navigation::visualize::visualize_nav_path", &["pathfinding", "path", "debug", "visual"]);
+    
+    if !settings.paths {
         return;
     }
 
@@ -143,8 +146,11 @@ pub fn visualize_agent_centers(
     child_query: Query<(&Transform, Option<&Collider>)>,
     existing_centers: Query<Entity, With<AgentCenterVisualMarker>>,
     settings: Res<NavigationVisualSettings>,
+    profiling: Res<ProfilingBuffer>,
 ) {
-    if !settings.enabled {
+    let _scope = ProfileScope::new(&profiling, "core::navigation::visualize::visualize_agent_centers", &["pathfinding", "agent", "debug", "visual"]);
+    
+    if !settings.agents {
         return;
     }
 

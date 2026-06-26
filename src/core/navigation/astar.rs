@@ -1,8 +1,8 @@
-// src/core/navigation/astar.rs
 use bevy::prelude::*;
 use avian2d::prelude::*;
 use std::collections::BinaryHeap;
 use crate::components::core::GameLayer;
+use crate::core::profiling::{ProfilingBuffer, ProfileScope};
 use super::nav_grid::NavGrid;
 use super::state::{
     ASTAR_ORTHOGONAL_COST, ASTAR_DIAGONAL_COST, COLLIDER_MIN_SIZE, NO_ROTATION, NAV_GRID_CELL_SIZE,
@@ -27,6 +27,7 @@ impl PartialOrd for Node {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn find_path(
     grid: &NavGrid, 
     start: Vec2, 
@@ -35,9 +36,12 @@ pub fn find_path(
     agent_half_size: Vec2,
     arrival_threshold: f32, 
     occupied_cells: &std::collections::HashSet<(usize, usize)>,
+    profiling: &ProfilingBuffer,
 ) -> Option<Vec<Vec2>> {
-    let Some((start_x, start_y)) = grid.world_to_grid(start) else { return None; };
-    let Some((goal_x, goal_y)) = grid.world_to_grid(goal) else { return None; };
+    let _scope = ProfileScope::new(profiling, "core::navigation::astar::find_path", &["pathfinding", "astar", "algorithm", "ai"]);
+    
+    let (start_x, start_y) = grid.world_to_grid(start)?;
+    let (goal_x, goal_y) = grid.world_to_grid(goal)?;
 
     let collider_min_size = *COLLIDER_MIN_SIZE;
     let astar_orthogonal_cost = *ASTAR_ORTHOGONAL_COST;

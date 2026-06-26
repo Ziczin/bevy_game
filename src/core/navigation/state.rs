@@ -1,8 +1,8 @@
-use bevy::prelude::*;
 use crate::components::core::DepthLayer;
 use crate::core::config::from_toml;
 #[allow(unused_imports)]
 use crate::core::macros::bevy_custom::markers;
+use bevy::prelude::*;
 
 from_toml!("config/navigation/navigation.toml", [
     NAV_GRID_CELL_SIZE: f32 = "grid.cell_size",
@@ -34,28 +34,67 @@ from_toml!("config/navigation/visual.toml", [
     AGENT_CENTER_UI_OFFSET: i32 = "layers.agent_center_ui_offset",
 ]);
 
-pub static NAV_GRID_UI_LAYER: std::sync::LazyLock<DepthLayer> = std::sync::LazyLock::new(|| DepthLayer::Ui(*NAV_GRID_UI_OFFSET as i16));
-pub static NAV_PATH_UI_LAYER: std::sync::LazyLock<DepthLayer> = std::sync::LazyLock::new(|| DepthLayer::Ui(*NAV_PATH_UI_OFFSET as i16));
-pub static AGENT_CENTER_UI_LAYER: std::sync::LazyLock<DepthLayer> = std::sync::LazyLock::new(|| DepthLayer::Ui(*AGENT_CENTER_UI_OFFSET as i16));
+pub static NAV_GRID_UI_LAYER: std::sync::LazyLock<DepthLayer> =
+    std::sync::LazyLock::new(|| DepthLayer::Ui(*NAV_GRID_UI_OFFSET as i16));
+pub static NAV_PATH_UI_LAYER: std::sync::LazyLock<DepthLayer> =
+    std::sync::LazyLock::new(|| DepthLayer::Ui(*NAV_PATH_UI_OFFSET as i16));
+pub static AGENT_CENTER_UI_LAYER: std::sync::LazyLock<DepthLayer> =
+    std::sync::LazyLock::new(|| DepthLayer::Ui(*AGENT_CENTER_UI_OFFSET as i16));
 
-pub static GRID_WALKABLE_COLOR: std::sync::LazyLock<Color> = std::sync::LazyLock::new(|| Color::srgba(
-    GRID_WALKABLE_COLOR_VEC.x, GRID_WALKABLE_COLOR_VEC.y, GRID_WALKABLE_COLOR_VEC.z, GRID_WALKABLE_COLOR_VEC.w,
-));
-pub static GRID_BLOCKED_COLOR: std::sync::LazyLock<Color> = std::sync::LazyLock::new(|| Color::srgba(
-    GRID_BLOCKED_COLOR_VEC.x, GRID_BLOCKED_COLOR_VEC.y, GRID_BLOCKED_COLOR_VEC.z, GRID_BLOCKED_COLOR_VEC.w,
-));
-pub static PATH_POINT_COLOR: std::sync::LazyLock<Color> = std::sync::LazyLock::new(|| Color::srgba(
-    PATH_POINT_COLOR_VEC.x, PATH_POINT_COLOR_VEC.y, PATH_POINT_COLOR_VEC.z, PATH_POINT_COLOR_VEC.w,
-));
-pub static PATH_LINE_COLOR: std::sync::LazyLock<Color> = std::sync::LazyLock::new(|| Color::srgba(
-    PATH_LINE_COLOR_VEC.x, PATH_LINE_COLOR_VEC.y, PATH_LINE_COLOR_VEC.z, PATH_LINE_COLOR_VEC.w,
-));
-pub static AGENT_CENTER_COLOR: std::sync::LazyLock<Color> = std::sync::LazyLock::new(|| Color::srgba(
-    AGENT_CENTER_COLOR_VEC.x, AGENT_CENTER_COLOR_VEC.y, AGENT_CENTER_COLOR_VEC.z, AGENT_CENTER_COLOR_VEC.w,
-));
-pub static AGENT_OUTLINE_COLOR: std::sync::LazyLock<Color> = std::sync::LazyLock::new(|| Color::srgba(
-    AGENT_OUTLINE_COLOR_VEC.x, AGENT_OUTLINE_COLOR_VEC.y, AGENT_OUTLINE_COLOR_VEC.z, AGENT_OUTLINE_COLOR_VEC.w,
-));
+pub static GRID_WALKABLE_COLOR: std::sync::LazyLock<Color> =
+    std::sync::LazyLock::new(|| {
+        Color::srgba(
+            GRID_WALKABLE_COLOR_VEC.x,
+            GRID_WALKABLE_COLOR_VEC.y,
+            GRID_WALKABLE_COLOR_VEC.z,
+            GRID_WALKABLE_COLOR_VEC.w,
+        )
+    });
+pub static GRID_BLOCKED_COLOR: std::sync::LazyLock<Color> =
+    std::sync::LazyLock::new(|| {
+        Color::srgba(
+            GRID_BLOCKED_COLOR_VEC.x,
+            GRID_BLOCKED_COLOR_VEC.y,
+            GRID_BLOCKED_COLOR_VEC.z,
+            GRID_BLOCKED_COLOR_VEC.w,
+        )
+    });
+pub static PATH_POINT_COLOR: std::sync::LazyLock<Color> =
+    std::sync::LazyLock::new(|| {
+        Color::srgba(
+            PATH_POINT_COLOR_VEC.x,
+            PATH_POINT_COLOR_VEC.y,
+            PATH_POINT_COLOR_VEC.z,
+            PATH_POINT_COLOR_VEC.w,
+        )
+    });
+pub static PATH_LINE_COLOR: std::sync::LazyLock<Color> =
+    std::sync::LazyLock::new(|| {
+        Color::srgba(
+            PATH_LINE_COLOR_VEC.x,
+            PATH_LINE_COLOR_VEC.y,
+            PATH_LINE_COLOR_VEC.z,
+            PATH_LINE_COLOR_VEC.w,
+        )
+    });
+pub static AGENT_CENTER_COLOR: std::sync::LazyLock<Color> =
+    std::sync::LazyLock::new(|| {
+        Color::srgba(
+            AGENT_CENTER_COLOR_VEC.x,
+            AGENT_CENTER_COLOR_VEC.y,
+            AGENT_CENTER_COLOR_VEC.z,
+            AGENT_CENTER_COLOR_VEC.w,
+        )
+    });
+pub static AGENT_OUTLINE_COLOR: std::sync::LazyLock<Color> =
+    std::sync::LazyLock::new(|| {
+        Color::srgba(
+            AGENT_OUTLINE_COLOR_VEC.x,
+            AGENT_OUTLINE_COLOR_VEC.y,
+            AGENT_OUTLINE_COLOR_VEC.z,
+            AGENT_OUTLINE_COLOR_VEC.w,
+        )
+    });
 
 markers! {
     NavGridVisualMarker,

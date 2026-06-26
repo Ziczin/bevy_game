@@ -33,9 +33,9 @@ impl FromTomlValue for AnimationConfig {
         let table = value.as_table().unwrap_or_else(|| panic!("Expected table for AnimationConfig, got {:?}", value));
         Self {
             name: table.get("name").and_then(|v| v.as_str()).unwrap_or_else(|| panic!("Missing 'name' in AnimationConfig")).to_string(),
-            frames: table.get("frames").map(|v| Vec::<usize>::from_toml_value(v)).unwrap_or_else(|| panic!("Missing 'frames' in AnimationConfig")),
+            frames: table.get("frames").map(Vec::<usize>::from_toml_value).unwrap_or_else(|| panic!("Missing 'frames' in AnimationConfig")),
             duration_ms: table.get("duration_ms").and_then(|v| v.as_integer()).unwrap_or_else(|| panic!("Missing 'duration_ms' in AnimationConfig")) as u64,
-            mode: table.get("mode").map(|v| AnimationMode::from_toml_value(v)).unwrap_or(AnimationMode::Once),
+            mode: table.get("mode").map(AnimationMode::from_toml_value).unwrap_or(AnimationMode::Once),
         }
     }
 }

@@ -111,12 +111,11 @@ pub const fn get_blob_tile_index(mask: u8) -> usize {
 pub fn debug_print_blob_tiles() {
     let mut seen = [false; 47];
 
-    for i in 0..256usize {
-        let algo_idx = BLOB_MAP[i] as usize;
-        if seen[algo_idx] { continue; }
-        seen[algo_idx] = true;
+    for (i, &algo_idx) in BLOB_MAP.iter().enumerate() {
+        if seen[algo_idx as usize] { continue; }
+        seen[algo_idx as usize] = true;
 
-        let (col, row) = BLOB_REMAP[algo_idx];
+        let (col, row) = BLOB_REMAP[algo_idx as usize];
 
         let bits: [bool; 8] = [
             (i & 0b10000000) != 0,

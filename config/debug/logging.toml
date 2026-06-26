@@ -1,0 +1,24 @@
+[settings]
+enabled = false
+active_preset = "all"
+
+[default]
+interval = 1.0
+tags = []
+exclude = []
+strict = false
+
+[[preset]]
+name = "all"
+
+[[preset]]
+name = "player_only"
+tags = ["player"]
+
+[[preset]]
+name = "slime_only"
+tags = ["red_slime"]
+
+[[preset]]
+name = "navmesh"
+tags = ["pathfinding", "astar"]

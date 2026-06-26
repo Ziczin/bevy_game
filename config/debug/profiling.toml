@@ -1,0 +1,26 @@
+[settings]
+enabled = true
+active_preset = "all"
+
+[default]
+interval = 1.0
+include_tags = []
+exclude_tags = []
+include_functions = []
+exclude_functions = []
+strict = false
+
+[[preset]]
+name = "all"
+
+[[preset]]
+name = "pathfinding_only"
+include_tags = ["pathfinding", "astar"]
+
+[[preset]]
+name = "player_only"
+include_tags = ["player"]
+
+[[preset]]
+name = "no_render"
+exclude_tags = ["render"]

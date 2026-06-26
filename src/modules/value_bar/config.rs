@@ -1,5 +1,5 @@
-use bevy::math::Vec4;
 use crate::core::config::from_toml;
+use bevy::math::Vec4;
 
 from_toml!("config/ui/value_bar.toml", [
     DEFAULT_WIDTH: f32 = "default.width",

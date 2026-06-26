@@ -1,0 +1,5 @@
+[visual]
+navmesh_points = false
+navmesh_paths = true
+navmesh_agents = true
+hitboxes = false

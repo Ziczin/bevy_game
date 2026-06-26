@@ -1,7 +1,7 @@
 // src/core/animation.rs
+use crate::core::dto::{AnimationConfig, AnimationMode};
 use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
-use crate::core::dto::{AnimationConfig, AnimationMode};
 
 pub fn create_animation(
     spritesheet: &Spritesheet,
@@ -9,13 +9,14 @@ pub fn create_animation(
     config: &AnimationConfig,
 ) -> Handle<Animation> {
     let mut builder = spritesheet.create_animation();
-    
+
     for &frame in &config.frames {
         builder = builder.add_cell(frame, 0);
     }
-    
-    builder = builder.set_duration(AnimationDuration::PerFrame(config.duration_ms as u32));
-    
+
+    builder = builder
+        .set_duration(AnimationDuration::PerFrame(config.duration_ms as u32));
+
     match config.mode {
         AnimationMode::Loop => {
             builder = builder.set_repetitions(AnimationRepeat::Loop);
@@ -26,6 +27,6 @@ pub fn create_animation(
         }
         AnimationMode::Once => {}
     }
-    
+
     animations.add(builder.build())
 }

@@ -18,7 +18,4 @@ macro_rules! animation_states {
     };
 }
 
-pub(crate) use {
-    markers,
-    animation_states,
-};
+pub(crate) use {animation_states, markers};

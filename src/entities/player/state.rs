@@ -4,8 +4,8 @@ use crate::core::dto::{AnimationConfig, SpriteSheetConfig};
 use crate::core::macros::bevy_alias::component_from_type;
 use crate::core::macros::bevy_custom::animation_states;
 use crate::core::macros::state_machine::behavior_states;
-use bitflags;
 use bevy::prelude::*;
+use bitflags::bitflags;
 
 from_toml!("config/player.toml", [
     MOVING_SPEED: f32 = "moving.speed",
@@ -29,7 +29,7 @@ animation_states!(Player { idle, walk });
 
 component_from_type!(MovingDirection, Vec2);
 
-bitflags::bitflags! {
+bitflags! {
     #[derive(Component, Clone, Copy, PartialEq, Default)]
     pub struct PlayerLogicFlags: u8 {
         const CanMove = 1 << 0;

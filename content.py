@@ -10,7 +10,7 @@ def is_text_file(path: Path) -> bool:
     return path.suffix.lower() in TEXT_EXTS or path.suffix == ""
 
 def file_header(relpath: str) -> str:
-    return f"// FILE: {relpath}\n"
+    return f"`FILE: {relpath}`\n"
 
 def read_text(path: Path) -> str:
     try:
@@ -34,7 +34,7 @@ def main():
         except ValueError:
             rel = str(path)
         parts.append(file_header(rel))
-        parts.append(read_text(path))
+        parts.append(f"```\n{read_text(path)}\n```")
         parts.append("\n")
 
     full = "\n".join(parts)

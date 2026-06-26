@@ -13,7 +13,11 @@ pub struct Pathfinder {
 }
 
 impl Pathfinder {
-    pub fn new(update_interval: f32, agent_half_size: Vec2, arrival_threshold: f32) -> Self {
+    pub fn new(
+        update_interval: f32,
+        agent_half_size: Vec2,
+        arrival_threshold: f32,
+    ) -> Self {
         Self {
             path: Vec::new(),
             current_waypoint: 0,

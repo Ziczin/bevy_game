@@ -1,12 +1,19 @@
-// FILE: src/modules/health/systems.rs
-use bevy::prelude::*;
 use super::components::*;
+use crate::core::profiling::{ProfileScope, ProfilingBuffer};
+use bevy::prelude::*;
 
 pub fn apply_damage_events(
-    mut health_query: Query<&mut Health>,
     resistances_query: Query<&Resistances>,
+    profiling: Res<ProfilingBuffer>,
+    mut health_query: Query<&mut Health>,
     mut damage_events: MessageReader<DamageEvent>,
 ) {
+    let _scope = ProfileScope::new(
+        &*profiling,
+        "modules::health::systems::apply_damage_events",
+        &["health", "damage", "combat", "event"],
+    );
+
     for event in damage_events.read() {
         if let Ok(mut health) = health_query.get_mut(event.target) {
             let resistance = resistances_query

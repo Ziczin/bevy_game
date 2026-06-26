@@ -1,10 +1,10 @@
-// src/core/navigation/pathfinding.rs
 use bevy::prelude::*;
 use avian2d::prelude::*;
 use std::collections::HashSet;
 use crate::components::markers::Player;
 use crate::components::pathfinding::Pathfinder;
 use crate::core::debug_log::DebugLogBuffer;
+use crate::core::profiling::{ProfilingBuffer, ProfileScope};
 use super::nav_grid::NavGrid;
 use super::astar::find_path;
 use super::state::{COLLIDER_MIN_SIZE, ELLIPSE_THRESHOLD};
@@ -62,21 +62,25 @@ fn get_occupied_cells(
     cells
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn update_paths(
     grid: Option<Res<NavGrid>>,
     player_query: Query<&Transform, With<Player>>,
     spatial_query: SpatialQuery,
-    mut pathfinder_query: Query<(Entity, &Transform, &Children, &mut Pathfinder)>,
     child_query: Query<(&Transform, Option<&Collider>)>,
     time: Res<Time>,
+    profiling: Res<ProfilingBuffer>,
+    mut pathfinder_query: Query<(Entity, &Transform, &Children, &mut Pathfinder)>,
     mut debug_log: ResMut<DebugLogBuffer>,
 ) {
+    let _scope = ProfileScope::new(&profiling, "core::navigation::pathfinding::update_paths", &["pathfinding", "astar", "update", "ai"]);
+    
     let Some(grid) = grid else { 
-        debug_log.add("⚠️ update_paths: NavGrid not ready");
+        debug_log.add(&["pathfinding"], "update_paths: NavGrid not ready");
         return; 
     };
     let Ok(player_transform) = player_query.single() else { 
-        debug_log.add("⚠️ update_paths: Player not found");
+        debug_log.add(&["pathfinding"], "update_paths: Player not found");
         return; 
     };
     let player_pos = player_transform.translation.xy();
@@ -99,7 +103,7 @@ pub fn update_paths(
         
         if distance_to_player <= pathfinder.arrival_threshold {
             if !pathfinder.path.is_empty() {
-                debug_log.add(format!("🎯 Slime {:?}: Arrived at target (distance: {:.1})", entity, distance_to_player));
+                debug_log.add(&["pathfinding"], format!("Slime {:?}: Arrived at target (distance: {:.1})", entity, distance_to_player));
                 pathfinder.path.clear();
                 pathfinder.current_waypoint = 0;
                 pathfinder.current_target = None;
@@ -113,15 +117,15 @@ pub fn update_paths(
             pathfinder.update_timer = 0.0;
             
             if grid.world_to_grid(collider_pos).is_none() {
-                debug_log.add(format!("❌ Slime {:?}: Start position ({:.1}, {:.1}) is outside NavGrid", entity, collider_pos.x, collider_pos.y));
+                debug_log.add(&["pathfinding"], format!("Slime {:?}: Start position ({:.1}, {:.1}) is outside NavGrid", entity, collider_pos.x, collider_pos.y));
                 continue;
             }
             if grid.world_to_grid(player_pos).is_none() {
-                debug_log.add(format!("❌ Slime {:?}: Player position ({:.1}, {:.1}) is outside NavGrid", entity, player_pos.x, player_pos.y));
+                debug_log.add(&["pathfinding"], format!("Slime {:?}: Player position ({:.1}, {:.1}) is outside NavGrid", entity, player_pos.x, player_pos.y));
                 continue;
             }
 
-            debug_log.add(format!("🧠 Slime {:?}: Attempting to find path from ({:.1}, {:.1}) to ({:.1}, {:.1})", entity, collider_pos.x, collider_pos.y, player_pos.x, player_pos.y));
+            debug_log.add(&["pathfinding"], format!("Slime {:?}: Attempting to find path from ({:.1}, {:.1}) to ({:.1}, {:.1})", entity, collider_pos.x, collider_pos.y, player_pos.x, player_pos.y));
             
             let mut occupied_without_self = HashSet::new();
             
@@ -131,15 +135,15 @@ pub fn update_paths(
                 occupied_without_self.extend(occupied);
             }
             
-            debug_log.add(format!("🧠 Slime {:?}: Occupied cells count: {}", entity, occupied_without_self.len()));
+            debug_log.add(&["pathfinding"], format!("Slime {:?}: Occupied cells count: {}", entity, occupied_without_self.len()));
             
-            if let Some(new_path) = find_path(&grid, collider_pos, player_pos, &spatial_query, pathfinder.agent_half_size, pathfinder.arrival_threshold, &occupied_without_self) {
-                debug_log.add(format!("✅ Slime {:?}: Path found with {} waypoints", entity, new_path.len()));
+            if let Some(new_path) = find_path(&grid, collider_pos, player_pos, &spatial_query, pathfinder.agent_half_size, pathfinder.arrival_threshold, &occupied_without_self, &profiling) {
+                debug_log.add(&["pathfinding"], format!("Slime {:?}: Path found with {} waypoints", entity, new_path.len()));
                 pathfinder.path = new_path;
                 pathfinder.current_waypoint = 0;
                 pathfinder.current_target = pathfinder.path.first().copied();
             } else {
-                debug_log.add(format!("❌ Slime {:?}: Path NOT found", entity));
+                debug_log.add(&["pathfinding"], format!("Slime {:?}: Path NOT found", entity));
                 pathfinder.path.clear();
                 pathfinder.current_target = None;
             }
@@ -147,6 +151,6 @@ pub fn update_paths(
     }
 
     if count == 0 {
-        debug_log.add("⚠️ update_paths: No pathfinders found");
+        debug_log.add(&["pathfinding"], "update_paths: No pathfinders found");
     }
 }

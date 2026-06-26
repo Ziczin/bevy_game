@@ -1,13 +1,19 @@
-// src/core/navigation/grid_builder.rs
 use bevy::prelude::*;
 use avian2d::prelude::*;
 use crate::components::core::GameLayer;
 use crate::components::markers::Player;
 use crate::core::debug_log::DebugLogBuffer;
+use crate::core::profiling::{ProfilingBuffer, ProfileScope};
 use super::nav_grid::NavGrid;
 use super::state::{NAV_GRID_CELL_SIZE, NAV_GRID_WIDTH, NAV_GRID_HEIGHT, NO_ROTATION};
 
-pub fn rebuild_nav_grid(grid: &mut NavGrid, spatial_query: &SpatialQuery) -> (usize, usize) {
+pub fn rebuild_nav_grid(
+    spatial_query: &SpatialQuery,
+    profiling: &ProfilingBuffer,
+    grid: &mut NavGrid,
+) -> (usize, usize) {
+    let _scope = ProfileScope::new(profiling, "core::navigation::grid_builder::rebuild_nav_grid", &["pathfinding", "navgrid", "setup", "spatial_query"]);
+    
     let movement_filter = SpatialQueryFilter::from_mask([GameLayer::World]);
     let vision_filter = SpatialQueryFilter::from_mask([GameLayer::VisionBlock]);
 
@@ -41,12 +47,15 @@ pub fn build_initial_nav_grid(
     mut commands: Commands,
     player_query: Query<&Transform, With<Player>>,
     spatial_query: SpatialQuery,
+    profiling: Res<ProfilingBuffer>,
     mut debug_log: ResMut<DebugLogBuffer>,
 ) {
-    debug_log.add("🔨 build_initial_nav_grid: Starting...");
+    let _scope = ProfileScope::new(&profiling, "core::navigation::grid_builder::build_initial_nav_grid", &["pathfinding", "navgrid", "setup", "spawn"]);
+    
+    debug_log.add(&["setup", "pathfinding"], "build_initial_nav_grid: Starting...");
     
     let Ok(player_transform) = player_query.single() else { 
-        debug_log.add("❌ build_initial_nav_grid: Player not found in PostStartup!");
+        debug_log.add(&["pathfinding"], "build_initial_nav_grid: Player not found in PostStartup!");
         return; 
     };
     let player_pos = player_transform.translation.xy();
@@ -55,15 +64,15 @@ pub fn build_initial_nav_grid(
     let grid_width = *NAV_GRID_WIDTH;
     let grid_height = *NAV_GRID_HEIGHT;
     
-    debug_log.add(format!("🔨 build_initial_nav_grid: Player found at ({:.1}, {:.1})", player_pos.x, player_pos.y));
+    debug_log.add(&["pathfinding"], format!("build_initial_nav_grid: Player found at ({:.1}, {:.1})", player_pos.x, player_pos.y));
     
     let initial_origin_x = (player_pos.x / cell_size).round() * cell_size;
     let initial_origin_y = (player_pos.y / cell_size).round() * cell_size;
     let aligned_player_pos = Vec2::new(initial_origin_x, initial_origin_y);
     
     let mut grid = NavGrid::new(cell_size, grid_width, grid_height, aligned_player_pos);
-    let (walkable, blocked) = rebuild_nav_grid(&mut grid, &spatial_query);
+    let (walkable, blocked) = rebuild_nav_grid(&spatial_query, &profiling, &mut grid);
     
     commands.insert_resource(grid);
-    debug_log.add(format!("✅ NavGrid построен: {}x{} клеток. Walkable: {}, Blocked: {}", grid_width, grid_height, walkable, blocked));
+    debug_log.add(&["pathfinding"], format!("NavGrid built: {}x{} cells. Walkable: {}, Blocked: {}", grid_width, grid_height, walkable, blocked));
 }

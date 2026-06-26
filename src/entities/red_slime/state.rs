@@ -1,11 +1,11 @@
 use bevy::math::Vec2;
 use bevy::prelude::Component;
 
-use crate::core::config::{from_toml, FromTomlValue};
+use crate::core::config::{FromTomlValue, from_toml};
 use crate::core::dto::{AnimationConfig, SpriteSheetConfig};
+use crate::core::macros::bevy_alias::component_from_type;
 use crate::core::macros::bevy_custom::animation_states;
 use crate::core::macros::state_machine::behavior_states;
-use crate::core::macros::bevy_alias::component_from_type;
 
 from_toml!("config/red_slime.toml", [
     WALK_SPEED: f32 = "moving.walk_speed",
@@ -44,10 +44,20 @@ pub struct SpawnPoint {
 
 impl FromTomlValue for SpawnPoint {
     fn from_toml_value(value: &toml::Value) -> Self {
-        let table = value.as_table().unwrap_or_else(|| panic!("Expected table for SpawnPoint, got {:?}", value));
+        let table = value.as_table().unwrap_or_else(|| {
+            panic!("Expected table for SpawnPoint, got {:?}", value)
+        });
         Self {
-            x: table.get("x").and_then(|v| v.as_integer()).unwrap_or_else(|| panic!("Missing 'x' in SpawnPoint")) as i32,
-            y: table.get("y").and_then(|v| v.as_integer()).unwrap_or_else(|| panic!("Missing 'y' in SpawnPoint")) as i32,
+            x: table
+                .get("x")
+                .and_then(|v| v.as_integer())
+                .unwrap_or_else(|| panic!("Missing 'x' in SpawnPoint"))
+                as i32,
+            y: table
+                .get("y")
+                .and_then(|v| v.as_integer())
+                .unwrap_or_else(|| panic!("Missing 'y' in SpawnPoint"))
+                as i32,
         }
     }
 }

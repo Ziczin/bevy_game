@@ -12,7 +12,7 @@ pub fn make_spritesheet(
 ) -> (Spritesheet, Sprite) {
     let image_width = columns as f32 * tile_size;
     let image_height = rows as f32 * tile_size;
-    
+
     let image = asset_server.load(AssetPath::from(path));
     let spritesheet = Spritesheet::new(&image, columns, rows);
 

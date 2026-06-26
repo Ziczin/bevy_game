@@ -90,10 +90,10 @@ pub fn read_toml_value<T: FromTomlValue>(path: &str, key_path: &str) -> T {
     let parts: Vec<&str> = key_path.split('.').collect();
     let mut current = &table;
     
-    for i in 0..parts.len() - 1 {
-        current = current.get(parts[i])
+    for part in parts.iter().take(parts.len() - 1) {
+        current = current.get(part)
             .and_then(|v| v.as_table())
-            .unwrap_or_else(|| panic!("Section '{}' not found in {}", parts[i], path));
+            .unwrap_or_else(|| panic!("Section '{}' not found in {}", part, path));
     }
     
     let value = current.get(parts[parts.len() - 1])

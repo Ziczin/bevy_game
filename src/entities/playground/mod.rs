@@ -1,11 +1,11 @@
-mod state;
-mod spawn_ground;
 mod spawn_fences;
+mod spawn_ground;
 mod spawn_paths;
+mod state;
 
 use bevy::prelude::*;
-use spawn_ground::spawn_ground;
 use spawn_fences::spawn_fences;
+use spawn_ground::spawn_ground;
 use spawn_paths::spawn_paths;
 
 pub struct PlaygroundPlugin;

@@ -77,9 +77,7 @@ impl Resistances {
             return 0.0;
         }
 
-        let total: f32 = damage_types.iter()
-            .map(|dt| self.get(*dt))
-            .sum();
+        let total: f32 = damage_types.iter().map(|dt| self.get(*dt)).sum();
 
         total / damage_types.len() as f32
     }

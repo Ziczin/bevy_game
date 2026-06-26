@@ -1,8 +1,8 @@
 // FILE: src/entities/player/health_input.rs
-use bevy::prelude::*;
 use crate::components::markers::Player;
-use crate::modules::health::{Health, DamageType, DamageEvent, Mana};
 use crate::core::config::from_toml;
+use crate::modules::health::{DamageEvent, DamageType, Health, Mana};
+use bevy::prelude::*;
 
 from_toml!("config/player.toml", [
     HEAL_AMOUNT: f32 = "health.heal_amount",
@@ -16,9 +16,15 @@ pub fn handle_health_input(
     mut damage_writer: MessageWriter<DamageEvent>,
     player_query: Query<Entity, With<Player>>,
 ) {
-    let Ok(player_entity) = player_query.single() else { return };
-    let Ok(mut health) = health_query.get_mut(player_entity) else { return };
-    let Ok(mut mana) = mana_query.get_mut(player_entity) else { return };
+    let Ok(player_entity) = player_query.single() else {
+        return;
+    };
+    let Ok(mut health) = health_query.get_mut(player_entity) else {
+        return;
+    };
+    let Ok(mut mana) = mana_query.get_mut(player_entity) else {
+        return;
+    };
 
     if keyboard.just_pressed(KeyCode::KeyH) {
         health.current = (health.current + *HEAL_AMOUNT).min(health.max);

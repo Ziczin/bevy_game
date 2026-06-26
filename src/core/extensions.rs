@@ -5,8 +5,8 @@ use crate::components::{core::DepthLayer, markers::{DepthOrderedDraw, DepthOrder
 
 pub trait EntityBuilderExt {
     fn at(self, x: i32, y: i32, layer: DepthLayer) -> Self;
-    fn as_dynamic_body(self) -> Self;
-    fn as_static_body(self) -> Self;
+    fn into_dynamic_body(self) -> Self;
+    fn into_static_body(self) -> Self;
     fn use_depth_ordered_draw(self) -> Self;
     fn use_depth_ordered_draw_once(self) -> Self;
     
@@ -37,31 +37,31 @@ impl EntityBuilderExt for EntityCommands<'_> {
             Transform::from_xyz(x as f32, y as f32, layer.depth_value()),
             layer,
         ));
-        return self;
+        self
     }
 
-    fn as_dynamic_body(mut self) -> Self {
+    fn into_dynamic_body(mut self) -> Self {
         self.insert((
             RigidBody::Dynamic, 
             LockedAxes::ROTATION_LOCKED,
             LinearVelocity::default(),
         ));
-        return self;
+        self
     }
 
-    fn as_static_body(mut self) -> Self {
+    fn into_static_body(mut self) -> Self {
         self.insert(RigidBody::Static);
-        return self;
+        self
     }
 
     fn use_depth_ordered_draw(mut self) -> Self {
         self.insert(DepthOrderedDraw);
-        return self;
+        self
     }
 
     fn use_depth_ordered_draw_once(mut self) -> Self {
         self.insert(DepthOrderedDrawOnce);
-        return self;
+        self
     }
 
     fn with_rect_collider(
@@ -80,7 +80,7 @@ impl EntityBuilderExt for EntityCommands<'_> {
                 CollisionLayers::new(layers, filters),
             ));
         });
-        return self;
+        self
     }
 
     fn with_oval_collider(
@@ -99,6 +99,6 @@ impl EntityBuilderExt for EntityCommands<'_> {
                 CollisionLayers::new(layers, filters),
             ));
         });
-        return self;
+        self
     }
 }
