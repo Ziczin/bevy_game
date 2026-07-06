@@ -14,12 +14,12 @@ pub struct DefaultPresetConfig {
 impl FromTomlValue for DefaultPresetConfig {
     fn from_toml_value(value: &toml::Value) -> Self {
         let table = value.as_table().unwrap_or_else(|| panic!("Expected table for [default], got {:?}", value));
-        Self {
+        return Self {
             interval: table.get("interval").and_then(|v| v.as_float()).unwrap_or_else(|| panic!("Missing 'interval' in [default]")) as f32,
             tags: table.get("tags").map(Vec::<String>::from_toml_value).unwrap_or_else(|| panic!("Missing 'tags' in [default]")),
             exclude: table.get("exclude").map(Vec::<String>::from_toml_value).unwrap_or_else(|| panic!("Missing 'exclude' in [default]")),
             strict: table.get("strict").and_then(|v| v.as_bool()).unwrap_or_else(|| panic!("Missing 'strict' in [default]")),
-        }
+        };
     }
 }
 
@@ -35,13 +35,13 @@ pub struct LogPreset {
 impl FromTomlValue for LogPreset {
     fn from_toml_value(value: &toml::Value) -> Self {
         let table = value.as_table().unwrap_or_else(|| panic!("Expected table for LogPreset, got {:?}", value));
-        Self {
+        return Self {
             name: table.get("name").and_then(|v| v.as_str()).unwrap_or_else(|| panic!("Missing 'name' in LogPreset")).to_string(),
             interval: table.get("interval").and_then(|v| v.as_float()).map(|v| v as f32),
             tags: table.get("tags").map(Vec::<String>::from_toml_value),
             exclude: table.get("exclude").map(Vec::<String>::from_toml_value),
             strict: table.get("strict").and_then(|v| v.as_bool()),
-        }
+        };
     }
 }
 
@@ -133,5 +133,4 @@ pub fn flush_debug_logs(
 pub fn flush_debug_logs(
     _buffer: ResMut<DebugLogBuffer>,
     _time: Res<Time>,
-) {
-}
+) {}

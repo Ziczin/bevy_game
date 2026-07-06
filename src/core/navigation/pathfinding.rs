@@ -19,7 +19,7 @@ fn get_collider_world_position(
             return transform.translation.xy() + child_transform.translation.xy();
         }
     }
-    transform.translation.xy()
+    return transform.translation.xy();
 }
 
 fn get_occupied_cells(
@@ -59,7 +59,7 @@ fn get_occupied_cells(
         }
     }
 
-    cells
+    return cells;
 }
 
 #[allow(clippy::too_many_arguments)]

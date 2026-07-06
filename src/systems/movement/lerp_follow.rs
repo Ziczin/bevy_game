@@ -22,5 +22,4 @@ pub fn lerp_follow_to_player(
         let t = (follow.smoothness * time.delta_secs()).clamp(0.0, 1.0);
         transform.translation = transform.translation.lerp(target_pos, t);
     }
-    return;
 }

@@ -1,13 +1,13 @@
-use super::state::{
-    PATH_ATLAS_COLS, PATH_ATLAS_ROWS, PATH_TEXTURE_PATH, PATTERN_OFFSET_X,
-    PATTERN_OFFSET_Y, TILE_SIZE,
-};
-use crate::components::core::DepthLayer;
-use crate::components::markers::Tile as TileMarker;
-use crate::core::blob_tilemap::get_blob_tile_index;
-use crate::core::profiling::{ProfileScope, ProfilingBuffer};
 use bevy::prelude::*;
 use std::collections::HashSet;
+use crate::components::markers::Tile as TileMarker;
+use crate::components::core::DepthLayer;
+use crate::core::blob_tilemap::get_blob_tile_index;
+use crate::core::profiling::{ProfilingBuffer, ProfileScope};
+use super::state::{
+    PATH_TEXTURE_PATH, PATH_ATLAS_COLS, PATH_ATLAS_ROWS,
+    TILE_SIZE, PATTERN_OFFSET_X, PATTERN_OFFSET_Y,
+};
 
 const PATTERN: &[&str] = &[
     ".#........#.#....",
@@ -37,21 +37,17 @@ const PATTERN: &[&str] = &[
 fn compute_moore_mask(x: i32, y: i32, tiles: &HashSet<(i32, i32)>) -> u8 {
     let mut mask = 0u8;
     let neighbors: [(i32, i32); 8] = [
-        (-1, -1),
-        (0, -1),
-        (1, -1),
-        (1, 0),
-        (1, 1),
-        (0, 1),
-        (-1, 1),
-        (-1, 0),
+        (-1, -1), (0, -1), (1, -1),
+        ( 1,  0),          (1,  1),
+        ( 0,  1),
+        (-1,  1), (-1, 0),
     ];
     for (bit, &(dx, dy)) in neighbors.iter().enumerate() {
         if tiles.contains(&(x + dx, y + dy)) {
             mask |= 1 << (7 - bit);
         }
     }
-    mask
+    return mask;
 }
 
 fn create_pattern_tiles() -> HashSet<(i32, i32)> {
@@ -66,7 +62,7 @@ fn create_pattern_tiles() -> HashSet<(i32, i32)> {
             }
         }
     }
-    tiles
+    return tiles;
 }
 
 pub fn spawn_paths(
@@ -75,15 +71,11 @@ pub fn spawn_paths(
     profiling: Res<ProfilingBuffer>,
     mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    let _scope = ProfileScope::new(
-        &*profiling,
-        "entities::playground::spawn_paths::spawn_paths",
-        &["playground", "setup", "spawn", "path", "tilemap"],
-    );
-
+    let _scope = ProfileScope::new(&profiling, "entities::playground::spawn_paths::spawn_paths", &["playground", "setup", "spawn", "path", "tilemap"]);
+    
     let image = asset_server.load(PATH_TEXTURE_PATH);
     let tile_size = *TILE_SIZE;
-
+    
     let layout = TextureAtlasLayout::from_grid(
         UVec2::splat(tile_size as u32),
         *PATH_ATLAS_COLS as u32,
@@ -124,9 +116,6 @@ pub fn spawn_paths(
         ));
     }
 
-    println!(
-        "Path tiles spawned: {} total, {} unique sprites",
-        path_tiles.len(),
-        unique_sprites.len()
-    );
+    println!("Path tiles spawned: {} total, {} unique sprites", 
+             path_tiles.len(), unique_sprites.len());
 }

@@ -40,7 +40,7 @@ pub fn rebuild_nav_grid(
             if walkable { walkable_count += 1; } else { blocked_count += 1; }
         }
     }
-    (walkable_count, blocked_count)
+    return (walkable_count, blocked_count);
 }
 
 pub fn build_initial_nav_grid(

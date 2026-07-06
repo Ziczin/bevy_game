@@ -8,53 +8,53 @@ pub trait FromTomlValue: Sized {
 
 impl FromTomlValue for f32 {
     fn from_toml_value(value: &toml::Value) -> Self {
-        value.as_float().unwrap_or_else(|| panic!("Expected f32, got {:?}", value)) as f32
+        return value.as_float().unwrap_or_else(|| panic!("Expected f32, got {:?}", value)) as f32;
     }
 }
 
 impl FromTomlValue for i32 {
     fn from_toml_value(value: &toml::Value) -> Self {
-        value.as_integer().unwrap_or_else(|| panic!("Expected i32, got {:?}", value)) as i32
+        return value.as_integer().unwrap_or_else(|| panic!("Expected i32, got {:?}", value)) as i32;
     }
 }
 
 impl FromTomlValue for u32 {
     fn from_toml_value(value: &toml::Value) -> Self {
-        value.as_integer().unwrap_or_else(|| panic!("Expected u32, got {:?}", value)) as u32
+        return value.as_integer().unwrap_or_else(|| panic!("Expected u32, got {:?}", value)) as u32;
     }
 }
 
 impl FromTomlValue for u64 {
     fn from_toml_value(value: &toml::Value) -> Self {
-        value.as_integer().unwrap_or_else(|| panic!("Expected u64, got {:?}", value)) as u64
+        return value.as_integer().unwrap_or_else(|| panic!("Expected u64, got {:?}", value)) as u64;
     }
 }
 
 impl FromTomlValue for usize {
     fn from_toml_value(value: &toml::Value) -> Self {
-        value.as_integer().unwrap_or_else(|| panic!("Expected usize, got {:?}", value)) as usize
+        return value.as_integer().unwrap_or_else(|| panic!("Expected usize, got {:?}", value)) as usize;
     }
 }
 
 impl FromTomlValue for bool {
     fn from_toml_value(value: &toml::Value) -> Self {
-        value.as_bool().unwrap_or_else(|| panic!("Expected bool, got {:?}", value))
+        return value.as_bool().unwrap_or_else(|| panic!("Expected bool, got {:?}", value));
     }
 }
 
 impl FromTomlValue for String {
     fn from_toml_value(value: &toml::Value) -> Self {
-        value.as_str().unwrap_or_else(|| panic!("Expected String, got {:?}", value)).to_string()
+        return value.as_str().unwrap_or_else(|| panic!("Expected String, got {:?}", value)).to_string();
     }
 }
 
 impl FromTomlValue for Vec2 {
     fn from_toml_value(value: &toml::Value) -> Self {
         let arr = value.as_array().unwrap_or_else(|| panic!("Expected array for Vec2, got {:?}", value));
-        Vec2::new(
+        return Vec2::new(
             arr[0].as_float().unwrap_or_else(|| panic!("Expected f32 for Vec2.x")) as f32,
             arr[1].as_float().unwrap_or_else(|| panic!("Expected f32 for Vec2.y")) as f32,
-        )
+        );
     }
 }
 
@@ -64,19 +64,19 @@ impl FromTomlValue for Vec4 {
         if arr.len() != 4 {
             panic!("Expected array of 4 elements for Vec4, got {}", arr.len());
         }
-        Vec4::new(
+        return Vec4::new(
             arr[0].as_float().unwrap_or_else(|| panic!("Expected f32 for Vec4.x")) as f32,
             arr[1].as_float().unwrap_or_else(|| panic!("Expected f32 for Vec4.y")) as f32,
             arr[2].as_float().unwrap_or_else(|| panic!("Expected f32 for Vec4.z")) as f32,
             arr[3].as_float().unwrap_or_else(|| panic!("Expected f32 for Vec4.w")) as f32,
-        )
+        );
     }
 }
 
 impl<T: FromTomlValue> FromTomlValue for Vec<T> {
     fn from_toml_value(value: &toml::Value) -> Self {
         let arr = value.as_array().unwrap_or_else(|| panic!("Expected array, got {:?}", value));
-        arr.iter().map(|v| T::from_toml_value(v)).collect()
+        return arr.iter().map(|v| T::from_toml_value(v)).collect();
     }
 }
 
@@ -91,7 +91,7 @@ pub fn read_toml_value<T: FromTomlValue>(path: &str, key_path: &str) -> T {
     let mut current = &table;
     
     for part in parts.iter().take(parts.len() - 1) {
-        current = current.get(part)
+        current = current.get(*part)
             .and_then(|v| v.as_table())
             .unwrap_or_else(|| panic!("Section '{}' not found in {}", part, path));
     }
@@ -99,7 +99,7 @@ pub fn read_toml_value<T: FromTomlValue>(path: &str, key_path: &str) -> T {
     let value = current.get(parts[parts.len() - 1])
         .unwrap_or_else(|| panic!("Key '{}' not found in {}", key_path, path));
     
-    T::from_toml_value(value)
+    return T::from_toml_value(value);
 }
 
 macro_rules! from_toml {
@@ -110,12 +110,12 @@ macro_rules! from_toml {
     };
     (@parse $file:expr, $name:ident, $ty:ty, $key:expr) => {
         pub static $name: std::sync::LazyLock<$ty> = std::sync::LazyLock::new(|| {
-            $crate::core::config::read_toml_value::<$ty>($file, $key)
+            return $crate::core::config::read_toml_value::<$ty>($file, $key);
         });
     };
     (@parse $file:expr, $name:ident, $ty:ty) => {
         pub static $name: std::sync::LazyLock<$ty> = std::sync::LazyLock::new(|| {
-            $crate::core::config::read_toml_value::<$ty>($file, stringify!($name))
+            return $crate::core::config::read_toml_value::<$ty>($file, stringify!($name));
         });
     };
 }

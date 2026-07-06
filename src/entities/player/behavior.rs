@@ -6,9 +6,9 @@ use super::state::{MOVING_SPEED, MovingDirection};
 pub fn behavior(
     profiling: Res<ProfilingBuffer>,
     mut player: Query<(
-        &mut LinearVelocity,
         &PlayerLogicFlags,
         &MovingDirection,
+        &mut LinearVelocity,
     ), With<Player>>,
 ) {
     let _scope = ProfileScope::new(&profiling, "entities::player::behavior::behavior", &["player", "behavior", "movement", "physics"]);
@@ -16,9 +16,9 @@ pub fn behavior(
     let speed = *MOVING_SPEED;
 
     for (
-        mut velocity,
         logic_flags,
-        direction
+        direction,
+        mut velocity,
     ) in &mut player {
         if logic_flags.contains(PlayerLogicFlags::CanMove) {
             velocity.x = direction.x * speed;

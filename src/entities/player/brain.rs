@@ -49,5 +49,4 @@ pub fn brain(
             sprite_sheet.switch(animation.idle.clone());
         }
     }
-    return;
 }

@@ -17,14 +17,14 @@ pub struct DefaultProfilingPreset {
 impl FromTomlValue for DefaultProfilingPreset {
     fn from_toml_value(value: &toml::Value) -> Self {
         let table = value.as_table().unwrap_or_else(|| panic!("Expected table for [default], got {:?}", value));
-        Self {
+        return Self {
             interval: table.get("interval").and_then(|v| v.as_float()).unwrap_or_else(|| panic!("Missing 'interval' in [default]")) as f32,
             include_tags: table.get("include_tags").map(Vec::<String>::from_toml_value).unwrap_or_else(|| panic!("Missing 'include_tags' in [default]")),
             exclude_tags: table.get("exclude_tags").map(Vec::<String>::from_toml_value).unwrap_or_else(|| panic!("Missing 'exclude_tags' in [default]")),
             include_functions: table.get("include_functions").map(Vec::<String>::from_toml_value).unwrap_or_else(|| panic!("Missing 'include_functions' in [default]")),
             exclude_functions: table.get("exclude_functions").map(Vec::<String>::from_toml_value).unwrap_or_else(|| panic!("Missing 'exclude_functions' in [default]")),
             strict: table.get("strict").and_then(|v| v.as_bool()).unwrap_or_else(|| panic!("Missing 'strict' in [default]")),
-        }
+        };
     }
 }
 
@@ -42,7 +42,7 @@ pub struct ProfilingPreset {
 impl FromTomlValue for ProfilingPreset {
     fn from_toml_value(value: &toml::Value) -> Self {
         let table = value.as_table().unwrap_or_else(|| panic!("Expected table for ProfilingPreset, got {:?}", value));
-        Self {
+        return Self {
             name: table.get("name").and_then(|v| v.as_str()).unwrap_or_else(|| panic!("Missing 'name' in ProfilingPreset")).to_string(),
             interval: table.get("interval").and_then(|v| v.as_float()).map(|v| v as f32),
             include_tags: table.get("include_tags").map(Vec::<String>::from_toml_value),
@@ -50,7 +50,7 @@ impl FromTomlValue for ProfilingPreset {
             include_functions: table.get("include_functions").map(Vec::<String>::from_toml_value),
             exclude_functions: table.get("exclude_functions").map(Vec::<String>::from_toml_value),
             strict: table.get("strict").and_then(|v| v.as_bool()),
-        }
+        };
     }
 }
 
@@ -91,13 +91,13 @@ pub struct ProfileScope<'a> {
 impl<'a> ProfileScope<'a> {
     pub fn new(buffer: &'a ProfilingBuffer, name: &str, tags: &[&str]) -> Self {
         let is_active = buffer.should_profile(name, tags);
-        Self {
+        return Self {
             buffer,
             name: name.to_string(),
             tags: tags.iter().map(|s| s.to_string()).collect(),
             start_time: Instant::now(),
             is_active,
-        }
+        };
     }
 }
 
@@ -126,7 +126,7 @@ pub struct ProfileScope;
 impl ProfileScope {
     #[inline(always)]
     pub fn new(_buffer: &ProfilingBuffer, _name: &str, _tags: &[&str]) -> Self {
-        Self
+        return Self;
     }
 }
 
@@ -154,7 +154,7 @@ impl ProfilingBuffer {
             self.include_tags.iter().any(|t| tags.contains(&t.as_str()))
         };
 
-        matches_functions && matches_tags
+        return matches_functions && matches_tags;
     }
 
     pub fn update_frame_start(&mut self) {
@@ -168,7 +168,9 @@ impl ProfilingBuffer {
 #[cfg(not(debug_assertions))]
 impl ProfilingBuffer {
     #[inline(always)]
-    pub fn should_profile(&self, _name: &str, _tags: &[&str]) -> bool { false }
+    pub fn should_profile(&self, _name: &str, _tags: &[&str]) -> bool { 
+        return false; 
+    }
     
     #[inline(always)]
     pub fn update_frame_start(&mut self) {}

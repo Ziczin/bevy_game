@@ -31,7 +31,7 @@ fn get_collider_world_position(
             return transform.translation.xy() + child_transform.translation.xy();
         }
     }
-    transform.translation.xy()
+    return transform.translation.xy();
 }
 
 pub fn visualize_nav_grid(

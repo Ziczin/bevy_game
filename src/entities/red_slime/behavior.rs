@@ -1,33 +1,31 @@
-use super::state::{
-    RedSlimeLogicFlags, RedSlimeState, RedSlimeStateHandler, WALK_SPEED,
-};
-use crate::{
-    core::profiling::{ProfileScope, ProfilingBuffer},
-    entities::red_slime::state::MovingDirection,
-};
-use avian2d::prelude::*;
 use bevy::prelude::*;
+use avian2d::prelude::*;
+use crate::{core::profiling::{ProfilingBuffer, ProfileScope}, entities::red_slime::state::MovingDirection};
+use super::state::{
+    RedSlimeStateHandler, RedSlimeState, RedSlimeLogicFlags,
+    WALK_SPEED
+};
 
 pub fn behavior(
     profiling: Res<ProfilingBuffer>,
     mut slime_query: Query<(
-        &mut LinearVelocity,
         &RedSlimeStateHandler,
         &RedSlimeLogicFlags,
         &MovingDirection,
+        &mut LinearVelocity,
     )>,
 ) {
-    let _scope = ProfileScope::new(
-        &*profiling,
-        "entities::red_slime::behavior::behavior",
-        &["red_slime", "behavior", "movement", "physics"],
-    );
-
+    let _scope = ProfileScope::new(&profiling, "entities::red_slime::behavior::behavior", &["red_slime", "behavior", "movement", "physics"]);
+    
     let speed = *WALK_SPEED;
 
-    for (mut velocity, state_handler, logic_flags, direction) in
-        &mut slime_query
-    {
+    for (
+        state_handler,
+        logic_flags,
+        direction,
+        mut velocity,
+    ) in &mut slime_query {
+
         match state_handler.get() {
             RedSlimeState::Idle => {
                 velocity.x = 0.0;
