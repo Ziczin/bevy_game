@@ -1,6 +1,7 @@
 use crate::core::config::from_toml;
 use avian2d::prelude::*;
 use bevy::prelude::*;
+use crate::core::macros::bevy_alias::component;
 
 from_toml!("config/global/display.toml", [
     DEPTH_ALWAYS_BOTTOM: f32 = "depth_layers.always_bottom",
@@ -76,3 +77,8 @@ impl DepthLayer {
         }
     }
 }
+
+component!(ZoomState {
+    current: f32,
+    target: f32,
+});

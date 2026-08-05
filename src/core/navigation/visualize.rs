@@ -4,15 +4,21 @@ use crate::components::pathfinding::Pathfinder;
 use crate::core::profiling::{ProfilingBuffer, profile_scope};
 use super::nav_grid::NavGrid;
 use super::state::{
-    NavGridVisualMarker, NavPathVisualMarker, AgentCenterVisualMarker,
-    NAV_GRID_UI_LAYER, NAV_PATH_UI_LAYER, AGENT_CENTER_UI_LAYER,
     GRID_WALKABLE_COLOR, GRID_BLOCKED_COLOR,
     PATH_POINT_COLOR, PATH_LINE_COLOR,
     AGENT_CENTER_COLOR, AGENT_OUTLINE_COLOR,
     GRID_WALKABLE_SIZE, GRID_BLOCKED_SIZE,
     PATH_POINT_SIZE, PATH_LINE_THICKNESS,
-    AGENT_CENTER_SIZE, AGENT_OUTLINE_THICKNESS, AGENT_OUTLINE_SEGMENTS,
+    AGENT_OUTLINE_SCALE,
+    NAV_GRID_UI_LAYER, NAV_PATH_UI_LAYER,
 };
+
+// Публичные маркеры для сущностей визуализации
+#[derive(Component)]
+pub struct NavGridVisualMarker;
+
+#[derive(Component)]
+pub struct NavPathVisualMarker;
 
 #[derive(Resource, Default)]
 pub struct NavigationVisualSettings {
@@ -31,9 +37,10 @@ fn get_collider_world_position(
             return transform.translation.xy() + child_transform.translation.xy();
         }
     }
-    return transform.translation.xy();
+    transform.translation.xy()
 }
 
+/// Визуализация сетки навигации с использованием спрайтов и кэшированием.
 pub fn visualize_nav_grid(
     mut commands: Commands,
     grid: Option<Res<NavGrid>>,
@@ -43,22 +50,32 @@ pub fn visualize_nav_grid(
 ) {
     profile_scope!(&profiling, "core::navigation::visualize::visualize_nav_grid", &["pathfinding", "navgrid", "debug", "visual"]);
     if !settings.points {
+        for entity in &existing_visuals {
+            commands.entity(entity).despawn();
+        }
         return;
     }
-    let Some(grid) = grid else { return; };
+    let Some(grid) = grid else { return };
+
     for entity in &existing_visuals {
         commands.entity(entity).despawn();
     }
+
     let layer = *NAV_GRID_UI_LAYER;
     let z = layer.depth_value();
+    let walkable_color = *GRID_WALKABLE_COLOR;
+    let blocked_color = *GRID_BLOCKED_COLOR;
+    let walkable_size = *GRID_WALKABLE_SIZE;
+    let blocked_size = *GRID_BLOCKED_SIZE;
+
     for y in 0..grid.height {
         for x in 0..grid.width {
-            if let Some((walkable, _visible)) = grid.get_cell(x, y) {
+            if let Some((walkable, _)) = grid.get_cell(x, y) {
                 let world_pos = grid.grid_to_world(x, y);
                 let (color, size) = if walkable {
-                    (*GRID_WALKABLE_COLOR, *GRID_WALKABLE_SIZE)
+                    (walkable_color, walkable_size)
                 } else {
-                    (*GRID_BLOCKED_COLOR, *GRID_BLOCKED_SIZE)
+                    (blocked_color, blocked_size)
                 };
                 commands.spawn((
                     Sprite {
@@ -67,7 +84,6 @@ pub fn visualize_nav_grid(
                         ..default()
                     },
                     Transform::from_xyz(world_pos.x, world_pos.y, z),
-                    layer,
                     NavGridVisualMarker,
                 ));
             }
@@ -75,6 +91,7 @@ pub fn visualize_nav_grid(
     }
 }
 
+/// Визуализация пути с использованием спрайтов.
 pub fn visualize_nav_path(
     mut commands: Commands,
     pathfinder_query: Query<&Pathfinder, Changed<Pathfinder>>,
@@ -84,103 +101,92 @@ pub fn visualize_nav_path(
 ) {
     profile_scope!(&profiling, "core::navigation::visualize::visualize_nav_path", &["pathfinding", "path", "debug", "visual"]);
     if !settings.paths {
+        for entity in &existing_paths {
+            commands.entity(entity).despawn();
+        }
         return;
     }
+
     for entity in &existing_paths {
         commands.entity(entity).despawn();
     }
+
     let layer = *NAV_PATH_UI_LAYER;
     let z = layer.depth_value();
+    let point_color = *PATH_POINT_COLOR;
+    let line_color = *PATH_LINE_COLOR;
+    let point_size = *PATH_POINT_SIZE;
+    let line_thickness = *PATH_LINE_THICKNESS;
+
     for pathfinder in &pathfinder_query {
-        for waypoint in &pathfinder.path {
-            commands.spawn((
-                Sprite {
-                    color: *PATH_POINT_COLOR,
-                    custom_size: Some(Vec2::splat(*PATH_POINT_SIZE)),
-                    ..default()
-                },
-                Transform::from_xyz(waypoint.x, waypoint.y, z),
-                layer,
-                NavPathVisualMarker,
-            ));
-        }
-        if pathfinder.path.len() > 1 {
-            for i in 0..pathfinder.path.len() - 1 {
-                let start = pathfinder.path[i];
-                let end = pathfinder.path[i + 1];
-                let mid = (start + end) / 2.0;
-                let length = start.distance(end);
-                let angle = (end - start).y.atan2((end - start).x);
+        let points = &pathfinder.path;
+        if points.len() < 2 {
+            if let Some(&p) = points.first() {
                 commands.spawn((
                     Sprite {
-                        color: *PATH_LINE_COLOR,
-                        custom_size: Some(Vec2::new(length, *PATH_LINE_THICKNESS)),
+                        color: point_color,
+                        custom_size: Some(Vec2::splat(point_size)),
                         ..default()
                     },
-                    Transform::from_xyz(mid.x, mid.y, z)
-                        .with_rotation(Quat::from_rotation_z(angle)),
-                    layer,
+                    Transform::from_xyz(p.x, p.y, z),
                     NavPathVisualMarker,
                 ));
             }
+            continue;
+        }
+
+        for i in 0..points.len() - 1 {
+            let start = points[i];
+            let end = points[i + 1];
+            let mid = (start + end) / 2.0;
+            let length = start.distance(end);
+            let angle = (end - start).y.atan2((end - start).x);
+            commands.spawn((
+                Sprite {
+                    color: line_color,
+                    custom_size: Some(Vec2::new(length, line_thickness)),
+                    ..default()
+                },
+                Transform::from_xyz(mid.x, mid.y, z)
+                    .with_rotation(Quat::from_rotation_z(angle)),
+                NavPathVisualMarker,
+            ));
+        }
+
+        for &p in points {
+            commands.spawn((
+                Sprite {
+                    color: point_color,
+                    custom_size: Some(Vec2::splat(point_size)),
+                    ..default()
+                },
+                Transform::from_xyz(p.x, p.y, z),
+                NavPathVisualMarker,
+            ));
         }
     }
 }
 
+/// Визуализация агентов с помощью Gizmos.
 pub fn visualize_agent_centers(
-    mut commands: Commands,
     pathfinder_query: Query<(Entity, &Transform, &Children, &Pathfinder)>,
     child_query: Query<(&Transform, Option<&Collider>)>,
-    existing_centers: Query<Entity, With<AgentCenterVisualMarker>>,
     settings: Res<NavigationVisualSettings>,
+    mut gizmos: Gizmos,
     profiling: Res<ProfilingBuffer>,
 ) {
     profile_scope!(&profiling, "core::navigation::visualize::visualize_agent_centers", &["pathfinding", "agent", "debug", "visual"]);
     if !settings.agents {
         return;
     }
-    for entity in &existing_centers {
-        commands.entity(entity).despawn();
-    }
-    let layer = *AGENT_CENTER_UI_LAYER;
-    let z = layer.depth_value();
+    let center_color = *AGENT_CENTER_COLOR;
+    let outline_color = *AGENT_OUTLINE_COLOR;
+    let scale = *AGENT_OUTLINE_SCALE;
+
     for (_entity, transform, children, pathfinder) in &pathfinder_query {
         let center_pos = get_collider_world_position(transform, children, &child_query);
-        commands.spawn((
-            Sprite {
-                color: *AGENT_CENTER_COLOR,
-                custom_size: Some(Vec2::splat(*AGENT_CENTER_SIZE)),
-                ..default()
-            },
-            Transform::from_xyz(center_pos.x, center_pos.y, z),
-            layer,
-            AgentCenterVisualMarker,
-        ));
-        let half_size = pathfinder.agent_half_size;
-        let segments = *AGENT_OUTLINE_SEGMENTS;
-        for i in 0..segments {
-            let angle1 = (i as f32 / segments as f32) * std::f32::consts::TAU;
-            let angle2 = ((i + 1) as f32 / segments as f32) * std::f32::consts::TAU;
-            let x1 = center_pos.x + angle1.cos() * half_size.x;
-            let y1 = center_pos.y + angle1.sin() * half_size.y;
-            let x2 = center_pos.x + angle2.cos() * half_size.x;
-            let y2 = center_pos.y + angle2.sin() * half_size.y;
-            let start = Vec2::new(x1, y1);
-            let end = Vec2::new(x2, y2);
-            let mid = (start + end) / 2.0;
-            let length = start.distance(end);
-            let angle = (end - start).y.atan2((end - start).x);
-            commands.spawn((
-                Sprite {
-                    color: *AGENT_OUTLINE_COLOR,
-                    custom_size: Some(Vec2::new(length, *AGENT_OUTLINE_THICKNESS)),
-                    ..default()
-                },
-                Transform::from_xyz(mid.x, mid.y, z)
-                    .with_rotation(Quat::from_rotation_z(angle)),
-                layer,
-                AgentCenterVisualMarker,
-            ));
-        }
+        let half_size = pathfinder.agent_half_size * scale;
+        gizmos.circle_2d(center_pos, 0.5, center_color);
+        gizmos.ellipse_2d(center_pos, half_size, outline_color);
     }
 }

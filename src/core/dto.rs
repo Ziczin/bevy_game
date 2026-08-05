@@ -1,4 +1,3 @@
-// src/core/dto.rs
 use bevy::prelude::*;
 use crate::core::config::FromTomlValue;
 

@@ -1,4 +1,3 @@
-// FILE: src/entities/playground/state.rs
 use crate::core::config::from_toml;
 use crate::core::dto::FenceSegment;
 

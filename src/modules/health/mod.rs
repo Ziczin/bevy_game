@@ -1,4 +1,3 @@
-// FILE: src/modules/health/mod.rs
 mod components;
 mod systems;
 

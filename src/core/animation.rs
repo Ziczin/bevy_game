@@ -1,4 +1,3 @@
-// src/core/animation.rs
 use crate::core::dto::{AnimationConfig, AnimationMode};
 use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;

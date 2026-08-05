@@ -1,16 +1,18 @@
 use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
+use crate::components::core::ZoomState;
 use crate::components::core::GameLayer;
 use crate::core::{make_spritesheet, extensions::EntityBuilderExt, animation::create_animation};
-use crate::components::{markers::Player, behavior::FollowPlayer, core::DepthLayer};
+use crate::components::{markers::Player, core::DepthLayer};
 use crate::core::debug_log::{DebugLogBuffer, debug_log};
 use crate::core::profiling::{ProfilingBuffer, profile_scope};
 use crate::core::config::from_toml;
+use crate::core::camera::{ZOOM_INITIAL_SCALE, ZOOM_INITIAL_TARGET_SCALE};
 use crate::entities::player::state::MovingDirection;
 use crate::modules::health::{Health, Mana, Resistances, DamageType};
 use crate::modules::value_bar::{spawn_value_bar, ValueBarConfig, ValueBarColors};
 use super::state::{
-    PlayerAnimation, PlayerStateHandler, CAMERA_FOLLOW_SMOOTHNESS, TILE_SIZE,
+    PlayerAnimation, PlayerStateHandler, TILE_SIZE,
     PLAYER_COLLIDER_HALF_WIDTH, PLAYER_COLLIDER_HALF_HEIGHT,
     PLAYER_COLLIDER_OFFSET_X, PLAYER_COLLIDER_OFFSET_Y,
     PlayerLogicFlags, SPRITESHEET, ANIMATIONS,
@@ -40,7 +42,10 @@ pub fn summon(
     commands.spawn((
         Camera2d,
         Msaa::Off,
-        FollowPlayer { smoothness: *CAMERA_FOLLOW_SMOOTHNESS }
+        ZoomState {
+            current: *ZOOM_INITIAL_SCALE,
+            target: *ZOOM_INITIAL_TARGET_SCALE,
+        },
     ));
     let ss = &*SPRITESHEET;
     let tile_size = *TILE_SIZE;

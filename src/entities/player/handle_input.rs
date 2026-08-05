@@ -10,10 +10,10 @@ pub fn handle_input(
 ) {
     profile_scope!(&profiling, "entities::player::handle_input::handle_input", &["player", "input", "keyboard"]);
     let mut direction = Vec2::ZERO;
-    if keyboard.pressed(KeyCode::ArrowLeft)  { direction.x -= 1.0; }
-    if keyboard.pressed(KeyCode::ArrowRight) { direction.x += 1.0; }
-    if keyboard.pressed(KeyCode::ArrowUp)    { direction.y += 1.0; }
-    if keyboard.pressed(KeyCode::ArrowDown)  { direction.y -= 1.0; }
+    if keyboard.pressed(KeyCode::KeyW) { direction.y += 1.0; }
+    if keyboard.pressed(KeyCode::KeyS) { direction.y -= 1.0; }
+    if keyboard.pressed(KeyCode::KeyA) { direction.x -= 1.0; }
+    if keyboard.pressed(KeyCode::KeyD) { direction.x += 1.0; }
     if direction.length_squared() > 0.0 {
         direction = direction.normalize();
     }

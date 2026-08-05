@@ -1,4 +1,3 @@
-// src/entities/red_slime/mod.rs
 use bevy::prelude::*;
 
 mod behavior;

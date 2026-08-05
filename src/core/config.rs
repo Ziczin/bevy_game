@@ -1,4 +1,3 @@
-// src/core/config.rs
 use std::fs;
 use bevy::math::{Vec2, Vec4};
 
@@ -86,19 +85,19 @@ pub fn read_toml_value<T: FromTomlValue>(path: &str, key_path: &str) -> T {
         .unwrap_or_else(|e| panic!("Cannot read {}: {}", full_path, e));
     let table: toml::Table = toml::from_str(&content)
         .unwrap_or_else(|e| panic!("Cannot parse {}: {}", full_path, e));
-    
+
     let parts: Vec<&str> = key_path.split('.').collect();
     let mut current = &table;
-    
+
     for part in parts.iter().take(parts.len() - 1) {
         current = current.get(*part)
             .and_then(|v| v.as_table())
             .unwrap_or_else(|| panic!("Section '{}' not found in {}", part, path));
     }
-    
+
     let value = current.get(parts[parts.len() - 1])
         .unwrap_or_else(|| panic!("Key '{}' not found in {}", key_path, path));
-    
+
     return T::from_toml_value(value);
 }
 

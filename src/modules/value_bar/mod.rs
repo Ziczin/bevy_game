@@ -1,4 +1,3 @@
-// FILE: src/modules/value_bar/mod.rs
 mod components;
 mod config;
 mod systems;

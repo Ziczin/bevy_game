@@ -1,4 +1,3 @@
-// FILE: src/modules/health/components.rs
 use bevy::prelude::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

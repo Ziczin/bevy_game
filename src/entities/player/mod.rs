@@ -1,4 +1,3 @@
-// FILE: src/entities/player/mod.rs
 use bevy::prelude::*;
 
 mod behavior;

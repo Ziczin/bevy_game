@@ -1,4 +1,3 @@
-// src/core/make_spritesheet.rs
 use bevy::{asset::AssetPath, prelude::*};
 use bevy_spritesheet_animation::prelude::*;
 

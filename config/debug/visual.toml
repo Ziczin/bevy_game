@@ -1,5 +1,12 @@
-[visual]
-navmesh_points = false
-navmesh_paths = true
-navmesh_agents = true
-hitboxes = false
+[navmesh]
+enabled = true
+points = true
+paths = true
+agents = true
+
+[hitboxes]
+enabled = true
+
+[overlay]
+enabled = true
+font_size = 8.0

@@ -1,0 +1,12 @@
+[zoom]
+min_scale = 0.2
+max_scale = 5.0
+step = 0.1
+lerp_factor = 0.9
+lerp_speed_scale = 4.0
+initial_scale = 1.0
+initial_target_scale = 0.5
+
+[follow]
+factor = 0.9
+speed_scale = 2.0

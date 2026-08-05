@@ -21,11 +21,8 @@ strip = "debuginfo"
 
 [dependencies]
 avian2d = "0.6.1"
-bevy = { version = "0.18.1", features = ["dynamic_linking"] }
+bevy = { version = "0.18.1", default-features = false, features = ["2d", "ui", "bevy_text", "dynamic_linking"] }
 bevy_spritesheet_animation = "6.1.0"
 bitflags = "2.13.0"
 paste = "1.0.15"
 toml = "1.1.2"
-
-[lints.clippy]
-needless_return = "allow"

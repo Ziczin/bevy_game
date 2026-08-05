@@ -1,4 +1,3 @@
-// FILE: src/entities/player/state.rs
 use crate::core::config::from_toml;
 use crate::core::dto::{AnimationConfig, SpriteSheetConfig};
 use crate::core::macros::bevy_alias::component_from_type;
@@ -20,7 +19,6 @@ from_toml!("config/player.toml", [
 ]);
 
 from_toml!("config/global/display.toml", [
-    CAMERA_FOLLOW_SMOOTHNESS: f32 = "camera.follow_smoothness",
     TILE_SIZE: f32 = "display.tile_size",
 ]);
 

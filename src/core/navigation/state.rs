@@ -1,7 +1,5 @@
 use crate::components::core::DepthLayer;
 use crate::core::config::from_toml;
-#[allow(unused_imports)]
-use crate::core::macros::bevy_custom::markers;
 use bevy::prelude::*;
 
 from_toml!("config/navigation/navigation.toml", [
@@ -26,20 +24,16 @@ from_toml!("config/navigation/visual.toml", [
     GRID_BLOCKED_SIZE: f32 = "sizes.grid_blocked",
     PATH_POINT_SIZE: f32 = "sizes.path_point",
     PATH_LINE_THICKNESS: f32 = "sizes.path_line_thickness",
-    AGENT_CENTER_SIZE: f32 = "sizes.agent_center",
     AGENT_OUTLINE_THICKNESS: f32 = "sizes.agent_outline_thickness",
-    AGENT_OUTLINE_SEGMENTS: usize = "other.agent_outline_segments",
+    AGENT_OUTLINE_SCALE: f32 = "sizes.agent_outline_scale",
     NAV_GRID_UI_OFFSET: i32 = "layers.nav_grid_ui_offset",
     NAV_PATH_UI_OFFSET: i32 = "layers.nav_path_ui_offset",
-    AGENT_CENTER_UI_OFFSET: i32 = "layers.agent_center_ui_offset",
 ]);
 
 pub static NAV_GRID_UI_LAYER: std::sync::LazyLock<DepthLayer> =
     std::sync::LazyLock::new(|| DepthLayer::Ui(*NAV_GRID_UI_OFFSET as i16));
 pub static NAV_PATH_UI_LAYER: std::sync::LazyLock<DepthLayer> =
     std::sync::LazyLock::new(|| DepthLayer::Ui(*NAV_PATH_UI_OFFSET as i16));
-pub static AGENT_CENTER_UI_LAYER: std::sync::LazyLock<DepthLayer> =
-    std::sync::LazyLock::new(|| DepthLayer::Ui(*AGENT_CENTER_UI_OFFSET as i16));
 
 pub static GRID_WALKABLE_COLOR: std::sync::LazyLock<Color> =
     std::sync::LazyLock::new(|| {
@@ -95,9 +89,3 @@ pub static AGENT_OUTLINE_COLOR: std::sync::LazyLock<Color> =
             AGENT_OUTLINE_COLOR_VEC.w,
         )
     });
-
-markers! {
-    NavGridVisualMarker,
-    NavPathVisualMarker,
-    AgentCenterVisualMarker,
-}

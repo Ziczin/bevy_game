@@ -109,6 +109,4 @@ pub fn spawn_paths(
             layer,
         ));
     }
-    println!("Path tiles spawned: {} total, {} unique sprites",
-        path_tiles.len(), unique_sprites.len());
 }
