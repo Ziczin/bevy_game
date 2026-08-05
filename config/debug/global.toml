@@ -5,3 +5,4 @@ enabled = true
 logging = true
 profiling = true
 visual = true
+overlay = true

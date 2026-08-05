@@ -8,6 +8,7 @@ pub mod dto;
 pub mod extensions;
 pub mod macros;
 pub mod navigation;
+pub mod overlay;
 pub mod profiling;
 
 mod make_spritesheet;

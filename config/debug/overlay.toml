@@ -1,0 +1,17 @@
+[settings]
+active_preset = "all"
+
+[default]
+tags = ["default"]
+
+[[preset]]
+name = "all"
+tags = ["default", "camera", "player"]
+
+[[preset]]
+name = "camera_only"
+tags = ["camera"]
+
+[[preset]]
+name = "player_only"
+tags = ["player"]

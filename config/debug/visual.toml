@@ -8,5 +8,4 @@ agents = true
 enabled = true
 
 [overlay]
-enabled = true
-font_size = 8.0
+font_size = 8.0   # только размер шрифта

@@ -6,15 +6,17 @@ use crate::core::config::from_toml;
 use crate::core::profiling::{ProfilingBuffer, profile_scope};
 use crate::components::core::ZoomState;
 use crate::components::markers::Player;
-use crate::modules::debug_overlay::DebugOverlay;
+use crate::core::overlay::DebugOverlay;
 use crate::core::navigation::state::AGENT_OUTLINE_THICKNESS;
 
+// Загружаем настройки окна из display.toml
 from_toml!("config/global/display.toml", [
     WINDOW_WIDTH: u32 = "display.window_width",
     WINDOW_HEIGHT: u32 = "display.window_height",
     SCALE_FACTOR_OVERRIDE: f32 = "display.scale_factor_override",
 ]);
 
+// Загружаем цвета для гизмо (тоже из display.toml)
 from_toml!("config/global/display.toml", [
     GIZMO_AABB_COLOR: Vec4 = "gizmos.aabb_color",
     GIZMO_COLLIDER_COLOR: Vec4 = "gizmos.collider_color",
@@ -84,7 +86,11 @@ pub fn zoom_system(
                 .clamp(zoom_config.min_scale, zoom_config.max_scale);
             zoom_state.target = new_target;
             if let Some(overlay) = overlay.as_mut() {
-                overlay.set("Zoom target", format!("{:.2}", zoom_state.target));
+                overlay.set_with_tags(
+                    "Zoom target",
+                    format!("{:.2}", zoom_state.target),
+                    &["camera"],
+                );
             }
         }
     }
@@ -109,8 +115,16 @@ pub fn apply_zoom_lerp(
         }
 
         if let Some(overlay) = overlay.as_mut() {
-            overlay.set("Zoom current", format!("{:.2}", zoom_state.current));
-            overlay.set("Zoom target", format!("{:.2}", zoom_state.target));
+            overlay.set_with_tags(
+                "Zoom current",
+                format!("{:.2}", zoom_state.current),
+                &["camera"],
+            );
+            overlay.set_with_tags(
+                "Zoom target",
+                format!("{:.2}", zoom_state.target),
+                &["camera"],
+            );
         }
     }
 }
@@ -134,6 +148,8 @@ pub fn apply_camera_follow(
     }
 }
 
+/// Настраивает плагины окна и изображений.
+/// Использует глобальные константы из display.toml.
 pub fn configure_window(app: &mut App) {
     app.add_plugins(
         DefaultPlugins
@@ -150,6 +166,8 @@ pub fn configure_window(app: &mut App) {
     );
 }
 
+/// Настраивает гизмо для физики (AABB и коллайдеры).
+/// Использует глобальные константы из display.toml и navigation/visual.toml.
 pub fn configure_gizmos(app: &mut App) {
     app.insert_gizmo_config(
         PhysicsGizmos {
