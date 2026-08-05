@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use crate::components::core::DepthLayer;
-use crate::core::profiling::{ProfilingBuffer, ProfileScope};
+use crate::core::profiling::{ProfilingBuffer, profile_scope};
 use super::components::ValueBar;
 use super::config::{ValueBarConfig, DELAY_BEFORE_ANIMATION, ANIMATION_DURATION, VISIBILITY_TIMEOUT, FADE_DURATION, COLOR_TRANSPARENT};
 
@@ -12,7 +12,6 @@ pub fn spawn_value_bar(
     let padding = config.background_padding;
     let bg_width = config.width + padding * 2.0;
     let bg_height = config.height + padding * 2.0;
-
     let background_entity = commands.spawn((
         Sprite {
             color: Color::srgba(
@@ -82,9 +81,7 @@ pub fn spawn_value_bar(
         delayed_damage_color: config.colors.delayed_damage,
         delayed_heal_color: config.colors.delayed_heal,
     }).id();
-
     commands.entity(owner).add_child(bar_entity);
-
     return bar_entity;
 }
 
@@ -93,8 +90,7 @@ pub fn update_delayed_value(
     profiling: Res<ProfilingBuffer>,
     mut bars: Query<&mut ValueBar>,
 ) {
-    let _scope = ProfileScope::new(&profiling, "modules::value_bar::systems::update_delayed_value", &["ui", "value_bar", "animation", "delayed"]);
-    
+    profile_scope!(&profiling, "modules::value_bar::systems::update_delayed_value", &["ui", "value_bar", "animation", "delayed"]);
     for mut bar in &mut bars {
         if (bar.target_delayed_value - bar.value).abs() > 0.001 {
             bar.target_delayed_value = bar.value;
@@ -103,14 +99,12 @@ pub fn update_delayed_value(
             bar.visibility_timer = *VISIBILITY_TIMEOUT;
             bar.is_visible = true;
         }
-
         if bar.delay_timer > 0.0 {
             bar.delay_timer -= time.delta_secs();
         } else if (bar.delayed_value - bar.target_delayed_value).abs() > 0.001 {
             bar.animation_timer += time.delta_secs();
             let t = (bar.animation_timer / *ANIMATION_DURATION).clamp(0.0, 1.0);
             bar.delayed_value = bar.delayed_value.lerp(bar.target_delayed_value, t);
-
             if bar.animation_timer >= *ANIMATION_DURATION {
                 bar.delayed_value = bar.target_delayed_value;
             }
@@ -123,13 +117,11 @@ pub fn update_value_bar_visuals(
     mut bars: Query<&mut ValueBar>,
     mut sprites: Query<(&mut Sprite, &mut Transform)>,
 ) {
-    let _scope = ProfileScope::new(&profiling, "modules::value_bar::systems::update_value_bar_visuals", &["ui", "value_bar", "render", "visual"]);
-    
+    profile_scope!(&profiling, "modules::value_bar::systems::update_value_bar_visuals", &["ui", "value_bar", "render", "visual"]);
     for bar in &mut bars {
         if !bar.is_visible {
             continue;
         }
-
         let current_ratio = bar.value.clamp(0.0, 1.0);
         let bar_width = bar.width;
         let bar_height = bar.height;
@@ -159,7 +151,6 @@ pub fn update_value_bar_visuals(
                 );
                 delayed_transform.translation = Vec3::new(bar_left + width / 2.0, bar.offset_y, 0.1);
             }
-
             if let Ok((mut current_sprite, mut current_transform)) = sprites.get_mut(bar.current_entity) {
                 let width = current_ratio * bar_width;
                 current_sprite.custom_size = Some(Vec2::new(width, bar_height));
@@ -183,7 +174,6 @@ pub fn update_value_bar_visuals(
                 );
                 delayed_transform.translation = Vec3::new(bar_left + width / 2.0, bar.offset_y, 0.1);
             }
-
             if let Ok((mut current_sprite, mut current_transform)) = sprites.get_mut(bar.current_entity) {
                 let width = bar.delayed_value * bar_width;
                 current_sprite.custom_size = Some(Vec2::new(width, bar_height));
@@ -205,18 +195,15 @@ pub fn update_value_bar_visibility(
     mut bars: Query<&mut ValueBar>,
     mut sprites: Query<&mut Sprite>,
 ) {
-    let _scope = ProfileScope::new(&profiling, "modules::value_bar::systems::update_value_bar_visibility", &["ui", "value_bar", "visibility", "fade"]);
-    
+    profile_scope!(&profiling, "modules::value_bar::systems::update_value_bar_visibility", &["ui", "value_bar", "visibility", "fade"]);
     for mut bar in &mut bars {
         if bar.visibility_timer > 0.0 {
             bar.visibility_timer -= time.delta_secs();
-
             let alpha = if bar.visibility_timer < *FADE_DURATION {
                 (bar.visibility_timer / *FADE_DURATION).clamp(0.0, 1.0)
             } else {
                 1.0
             };
-
             let entities = [
                 (bar.background_entity, bar.background_color),
                 (bar.current_entity, bar.current_color),
@@ -226,7 +213,6 @@ pub fn update_value_bar_visibility(
                     bar.delayed_heal_color
                 }),
             ];
-
             for (entity, base_color) in entities {
                 if let Ok(mut sprite) = sprites.get_mut(entity) {
                     sprite.color = Color::srgba(base_color.x, base_color.y, base_color.z, alpha);
@@ -234,7 +220,6 @@ pub fn update_value_bar_visibility(
             }
         } else if bar.is_visible {
             bar.is_visible = false;
-
             for entity in [bar.background_entity, bar.current_entity, bar.delayed_entity] {
                 if let Ok(mut sprite) = sprites.get_mut(entity) {
                     sprite.color = Color::srgba(

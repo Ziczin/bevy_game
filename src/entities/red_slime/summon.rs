@@ -1,14 +1,13 @@
 use bevy::prelude::*;
 use bevy_spritesheet_animation::prelude::*;
 use avian2d::prelude::*;
-
 use crate::components::core::{DepthLayer, GameLayer};
 use crate::components::pathfinding::Pathfinder;
 use crate::core::extensions::EntityBuilderExt;
 use crate::core::make_spritesheet;
 use crate::core::animation::create_animation;
-use crate::core::debug_log::DebugLogBuffer;
-use crate::core::profiling::{ProfilingBuffer, ProfileScope};
+use crate::core::debug_log::{DebugLogBuffer, debug_log};
+use crate::core::profiling::{ProfilingBuffer, profile_scope};
 use crate::core::config::from_toml;
 use crate::entities::red_slime::state::RedSlimeLogicFlags;
 use super::state::{
@@ -34,18 +33,15 @@ pub fn spawn_single_red_slime(
     size: i32,
 ) {
     let sprite = sprite_template.clone();
-    
     let width = size * *SPRITE_SIZE_MULTIPLIER_X;
     let height = size * *SPRITE_SIZE_MULTIPLIER_Y;
-
     let agent_half_size = Vec2::new(width as f32 + *COLLIDER_PADDING, height as f32 + *COLLIDER_PADDING);
-    
     let entity = commands.spawn((
         sprite,
         SpritesheetAnimation::new(idle_anim.clone()),
-        RedSlimeAnimation { 
-            idle: idle_anim, 
-            walk: walk_anim, 
+        RedSlimeAnimation {
+            idle: idle_anim,
+            walk: walk_anim,
         },
         RedSlimeStateHandler::default(),
         Pathfinder::new(*PATHFINDER_UPDATE_INTERVAL, agent_half_size, *WALK_DISTANCE_END),
@@ -63,8 +59,7 @@ pub fn spawn_single_red_slime(
         [GameLayer::World, GameLayer::DynamicBody],
     )
     .id();
-
-    debug_log.add(&["red_slime", "setup"], format!("RedSlime spawned at ({}, {}) with entity ID: {:?}", x, y, entity));
+    debug_log!(debug_log, &["red_slime", "setup"], "RedSlime spawned at ({}, {}) with entity ID: {:?}", x, y, entity);
 }
 
 pub fn summon(
@@ -75,27 +70,21 @@ pub fn summon(
     mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     mut debug_log: ResMut<DebugLogBuffer>,
 ) {
-    let _scope = ProfileScope::new(&profiling, "entities::red_slime::summon::summon", &["red_slime", "setup", "spawn", "entity"]);
-    
-    debug_log.add(&["red_slime", "setup"], "RedSlime summon started");
-
+    profile_scope!(&profiling, "entities::red_slime::summon::summon", &["red_slime", "setup", "spawn", "entity"]);
+    debug_log!(&mut debug_log, &["red_slime", "setup"], "RedSlime summon started");
     let ss = &*SPRITESHEET;
     let tile_size = *TILE_SIZE;
     let (spritesheet, sprite_template) = make_spritesheet(
         &asset_server, &mut atlas_layouts,
         ss.path.clone(), ss.columns, ss.rows, tile_size
     );
-
     let anim_configs = &*ANIMATIONS;
     let walk_config = anim_configs.iter().find(|c| c.name == "walk").expect("Missing 'walk' animation");
     let idle_config = anim_configs.iter().find(|c| c.name == "idle").expect("Missing 'idle' animation");
-
     let idle_handler = create_animation(&spritesheet, &mut animations, idle_config);
     let walk_handler = create_animation(&spritesheet, &mut animations, walk_config);
-
     for point in SPAWN_POINTS.iter() {
         spawn_single_red_slime(&mut commands, point.x, point.y, &sprite_template, idle_handler.clone(), walk_handler.clone(), &mut debug_log, 1);
     }
-
-    debug_log.add(&["red_slime", "setup"], "All RedSlimes spawned successfully");
+    debug_log!(&mut debug_log, &["red_slime", "setup"], "All RedSlimes spawned successfully");
 }

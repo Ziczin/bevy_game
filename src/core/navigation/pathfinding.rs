@@ -3,8 +3,8 @@ use avian2d::prelude::*;
 use std::collections::HashSet;
 use crate::components::markers::Player;
 use crate::components::pathfinding::Pathfinder;
-use crate::core::debug_log::DebugLogBuffer;
-use crate::core::profiling::{ProfilingBuffer, ProfileScope};
+use crate::core::debug_log::{DebugLogBuffer, debug_log};
+use crate::core::profiling::{ProfilingBuffer, profile_scope};
 use super::nav_grid::NavGrid;
 use super::astar::find_path;
 use super::state::{COLLIDER_MIN_SIZE, ELLIPSE_THRESHOLD};
@@ -29,36 +29,26 @@ fn get_occupied_cells(
     current_half_size: Vec2,
 ) -> HashSet<(usize, usize)> {
     let mut cells = HashSet::new();
-
     let collider_min_size = *COLLIDER_MIN_SIZE;
     let ellipse_threshold = *ELLIPSE_THRESHOLD;
-
     let rx = (other_half_size.x + current_half_size.x).max(collider_min_size);
     let ry = (other_half_size.y + current_half_size.y).max(collider_min_size);
-
     let Some((agent_gx, agent_gy)) = grid.world_to_grid(other_pos) else { return cells; };
-
     let cells_rx = (rx / grid.cell_size).ceil() as isize + 1;
     let cells_ry = (ry / grid.cell_size).ceil() as isize + 1;
-
     for dx in -cells_rx..=cells_rx {
         for dy in -cells_ry..=cells_ry {
             let gx = (agent_gx as isize + dx) as usize;
             let gy = (agent_gy as isize + dy) as usize;
-
             if gx >= grid.width || gy >= grid.height { continue; }
-
             let cell_center = grid.grid_to_world(gx, gy);
-
             let norm_x = (cell_center.x - other_pos.x) / rx;
             let norm_y = (cell_center.y - other_pos.y) / ry;
-
             if norm_x * norm_x + norm_y * norm_y <= ellipse_threshold {
                 cells.insert((gx, gy));
             }
         }
     }
-
     return cells;
 }
 
@@ -73,84 +63,68 @@ pub fn update_paths(
     mut pathfinder_query: Query<(Entity, &Transform, &Children, &mut Pathfinder)>,
     mut debug_log: ResMut<DebugLogBuffer>,
 ) {
-    let _scope = ProfileScope::new(&profiling, "core::navigation::pathfinding::update_paths", &["pathfinding", "astar", "update", "ai"]);
-    
-    let Some(grid) = grid else { 
-        debug_log.add(&["pathfinding"], "update_paths: NavGrid not ready");
-        return; 
+    profile_scope!(&profiling, "core::navigation::pathfinding::update_paths", &["pathfinding", "astar", "update", "ai"]);
+    let Some(grid) = grid else {
+        debug_log!(&mut debug_log, &["pathfinding"], "update_paths: NavGrid not ready");
+        return;
     };
-    let Ok(player_transform) = player_query.single() else { 
-        debug_log.add(&["pathfinding"], "update_paths: Player not found");
-        return; 
+    let Ok(player_transform) = player_query.single() else {
+        debug_log!(&mut debug_log, &["pathfinding"], "update_paths: Player not found");
+        return;
     };
     let player_pos = player_transform.translation.xy();
-
     let mut agent_data: Vec<(Entity, Vec2, Vec2)> = Vec::new();
-    
     for (entity, transform, children, pathfinder) in &pathfinder_query {
         let collider_pos = get_collider_world_position(transform, children, &child_query);
         agent_data.push((entity, collider_pos, pathfinder.agent_half_size));
     }
-
     let mut count = 0;
     for (entity, transform, children, mut pathfinder) in &mut pathfinder_query {
         count += 1;
-        
         if !pathfinder.is_active { continue; }
-
         let collider_pos = get_collider_world_position(transform, children, &child_query);
         let distance_to_player = transform.translation.xy().distance(player_pos);
-        
         if distance_to_player <= pathfinder.arrival_threshold {
             if !pathfinder.path.is_empty() {
-                debug_log.add(&["pathfinding"], format!("Slime {:?}: Arrived at target (distance: {:.1})", entity, distance_to_player));
+                debug_log!(&mut debug_log, &["pathfinding"], "Slime {:?}: Arrived at target (distance: {:.1})", entity, distance_to_player);
                 pathfinder.path.clear();
                 pathfinder.current_waypoint = 0;
                 pathfinder.current_target = None;
             }
             continue;
         }
-
         pathfinder.update_timer += time.delta_secs();
-        
         if pathfinder.update_timer >= pathfinder.update_interval {
             pathfinder.update_timer = 0.0;
-            
             if grid.world_to_grid(collider_pos).is_none() {
-                debug_log.add(&["pathfinding"], format!("Slime {:?}: Start position ({:.1}, {:.1}) is outside NavGrid", entity, collider_pos.x, collider_pos.y));
+                debug_log!(&mut debug_log, &["pathfinding"], "Slime {:?}: Start position ({:.1}, {:.1}) is outside NavGrid", entity, collider_pos.x, collider_pos.y);
                 continue;
             }
             if grid.world_to_grid(player_pos).is_none() {
-                debug_log.add(&["pathfinding"], format!("Slime {:?}: Player position ({:.1}, {:.1}) is outside NavGrid", entity, player_pos.x, player_pos.y));
+                debug_log!(&mut debug_log, &["pathfinding"], "Slime {:?}: Player position ({:.1}, {:.1}) is outside NavGrid", entity, player_pos.x, player_pos.y);
                 continue;
             }
-
-            debug_log.add(&["pathfinding"], format!("Slime {:?}: Attempting to find path from ({:.1}, {:.1}) to ({:.1}, {:.1})", entity, collider_pos.x, collider_pos.y, player_pos.x, player_pos.y));
-            
+            debug_log!(&mut debug_log, &["pathfinding"], "Slime {:?}: Attempting to find path from ({:.1}, {:.1}) to ({:.1}, {:.1})", entity, collider_pos.x, collider_pos.y, player_pos.x, player_pos.y);
             let mut occupied_without_self = HashSet::new();
-            
             for (other_entity, other_pos, other_half_size) in &agent_data {
                 if *other_entity == entity { continue; }
                 let occupied = get_occupied_cells(&grid, *other_pos, *other_half_size, pathfinder.agent_half_size);
                 occupied_without_self.extend(occupied);
             }
-            
-            debug_log.add(&["pathfinding"], format!("Slime {:?}: Occupied cells count: {}", entity, occupied_without_self.len()));
-            
+            debug_log!(&mut debug_log, &["pathfinding"], "Slime {:?}: Occupied cells count: {}", entity, occupied_without_self.len());
             if let Some(new_path) = find_path(&grid, collider_pos, player_pos, &spatial_query, pathfinder.agent_half_size, pathfinder.arrival_threshold, &occupied_without_self, &profiling) {
-                debug_log.add(&["pathfinding"], format!("Slime {:?}: Path found with {} waypoints", entity, new_path.len()));
+                debug_log!(&mut debug_log, &["pathfinding"], "Slime {:?}: Path found with {} waypoints", entity, new_path.len());
                 pathfinder.path = new_path;
                 pathfinder.current_waypoint = 0;
                 pathfinder.current_target = pathfinder.path.first().copied();
             } else {
-                debug_log.add(&["pathfinding"], format!("Slime {:?}: Path NOT found", entity));
+                debug_log!(&mut debug_log, &["pathfinding"], "Slime {:?}: Path NOT found", entity);
                 pathfinder.path.clear();
                 pathfinder.current_target = None;
             }
         }
     }
-
     if count == 0 {
-        debug_log.add(&["pathfinding"], "update_paths: No pathfinders found");
+        debug_log!(&mut debug_log, &["pathfinding"], "update_paths: No pathfinders found");
     }
 }

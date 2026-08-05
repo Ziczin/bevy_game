@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use crate::components::markers::Tile as TileMarker;
 use crate::components::core::DepthLayer;
 use crate::core::blob_tilemap::get_blob_tile_index;
-use crate::core::profiling::{ProfilingBuffer, ProfileScope};
+use crate::core::profiling::{ProfilingBuffer, profile_scope};
 use super::state::{
     PATH_TEXTURE_PATH, PATH_ATLAS_COLS, PATH_ATLAS_ROWS,
     TILE_SIZE, PATTERN_OFFSET_X, PATTERN_OFFSET_Y,
@@ -71,11 +71,9 @@ pub fn spawn_paths(
     profiling: Res<ProfilingBuffer>,
     mut atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    let _scope = ProfileScope::new(&profiling, "entities::playground::spawn_paths::spawn_paths", &["playground", "setup", "spawn", "path", "tilemap"]);
-    
+    profile_scope!(&profiling, "entities::playground::spawn_paths::spawn_paths", &["playground", "setup", "spawn", "path", "tilemap"]);
     let image = asset_server.load(PATH_TEXTURE_PATH);
     let tile_size = *TILE_SIZE;
-    
     let layout = TextureAtlasLayout::from_grid(
         UVec2::splat(tile_size as u32),
         *PATH_ATLAS_COLS as u32,
@@ -84,22 +82,18 @@ pub fn spawn_paths(
         None,
     );
     let layout_handle = atlas_layouts.add(layout);
-
     let path_tiles = create_pattern_tiles();
     let mut unique_sprites = HashSet::new();
-
     for &(x, y) in &path_tiles {
         let mask = compute_moore_mask(x, y, &path_tiles);
         let sprite_index = get_blob_tile_index(mask);
         unique_sprites.insert(sprite_index);
-
         let layer = DepthLayer::Ground(1);
         let transform = Transform::from_xyz(
             x as f32 * tile_size,
             y as f32 * tile_size,
             layer.depth_value(),
         );
-
         commands.spawn((
             Sprite {
                 image: image.clone(),
@@ -115,7 +109,6 @@ pub fn spawn_paths(
             layer,
         ));
     }
-
-    println!("Path tiles spawned: {} total, {} unique sprites", 
-             path_tiles.len(), unique_sprites.len());
+    println!("Path tiles spawned: {} total, {} unique sprites",
+        path_tiles.len(), unique_sprites.len());
 }

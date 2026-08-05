@@ -45,6 +45,7 @@ impl FromTomlValue for LogPreset {
     }
 }
 
+#[cfg(debug_assertions)]
 #[derive(Resource, Default)]
 pub struct DebugLogBuffer {
     pub messages: HashSet<String>,
@@ -56,21 +57,22 @@ pub struct DebugLogBuffer {
     pub strict: bool,
 }
 
+#[cfg(not(debug_assertions))]
+#[derive(Resource, Default)]
+pub struct DebugLogBuffer;
+
+#[cfg(debug_assertions)]
 impl DebugLogBuffer {
-    #[cfg(debug_assertions)]
     pub fn add(&mut self, tags: &[&str], msg: impl Into<String>) {
         if !self.enabled {
             return;
         }
-        
         if tags.is_empty() {
             panic!("Debug log error: message tags (B) cannot be empty!");
         }
-
         if !self.exclude_tags.is_empty() && self.exclude_tags.iter().any(|t| tags.contains(&t.as_str())) {
             return;
         }
-
         let should_log = if self.active_tags.is_empty() {
             true
         } else if self.strict {
@@ -82,7 +84,6 @@ impl DebugLogBuffer {
         } else {
             self.active_tags.iter().any(|t| tags.contains(&t.as_str()))
         };
-
         if should_log {
             let formatted_msg = if !self.strict {
                 format!("[{}] {}", tags.join(" "), msg.into())
@@ -92,11 +93,20 @@ impl DebugLogBuffer {
             self.messages.insert(formatted_msg);
         }
     }
-
-    #[cfg(not(debug_assertions))]
-    #[inline(always)]
-    pub fn add(&mut self, _tags: &[&str], _msg: impl Into<String>) {}
 }
+
+#[cfg(debug_assertions)]
+macro_rules! debug_log {
+    ($buffer:expr, $tags:expr, $($arg:tt)*) => {
+        $crate::core::debug_log::DebugLogBuffer::add($buffer, $tags, format!($($arg)*))
+    };
+}
+
+#[cfg(not(debug_assertions))]
+macro_rules! debug_log {
+    ($buffer:expr, $tags:expr, $($arg:tt)*) => {};
+}
+pub(crate) use debug_log;
 
 #[cfg(debug_assertions)]
 pub fn flush_debug_logs(
@@ -106,25 +116,20 @@ pub fn flush_debug_logs(
     if !buffer.enabled {
         return;
     }
-
     buffer.timer += time.delta_secs();
-    
     if buffer.timer >= buffer.interval {
         buffer.timer = 0.0;
-        
         if !buffer.messages.is_empty() {
             let timestamp = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_secs();
-            
             println!("=== Debug Logs [{}] ===", timestamp);
             for msg in &buffer.messages {
                 println!("- {}", msg);
             }
             println!();
         }
-        
         buffer.messages.clear();
     }
 }

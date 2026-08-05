@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use avian2d::prelude::*;
 use crate::components::pathfinding::Pathfinder;
-use crate::core::profiling::{ProfilingBuffer, ProfileScope};
+use crate::core::profiling::{ProfilingBuffer, profile_scope};
 use super::nav_grid::NavGrid;
 use super::state::{
     NavGridVisualMarker, NavPathVisualMarker, AgentCenterVisualMarker,
@@ -41,21 +41,16 @@ pub fn visualize_nav_grid(
     settings: Res<NavigationVisualSettings>,
     profiling: Res<ProfilingBuffer>,
 ) {
-    let _scope = ProfileScope::new(&profiling, "core::navigation::visualize::visualize_nav_grid", &["pathfinding", "navgrid", "debug", "visual"]);
-    
+    profile_scope!(&profiling, "core::navigation::visualize::visualize_nav_grid", &["pathfinding", "navgrid", "debug", "visual"]);
     if !settings.points {
         return;
     }
-
     let Some(grid) = grid else { return; };
-
     for entity in &existing_visuals {
         commands.entity(entity).despawn();
     }
-
     let layer = *NAV_GRID_UI_LAYER;
     let z = layer.depth_value();
-
     for y in 0..grid.height {
         for x in 0..grid.width {
             if let Some((walkable, _visible)) = grid.get_cell(x, y) {
@@ -65,7 +60,6 @@ pub fn visualize_nav_grid(
                 } else {
                     (*GRID_BLOCKED_COLOR, *GRID_BLOCKED_SIZE)
                 };
-
                 commands.spawn((
                     Sprite {
                         color,
@@ -88,19 +82,15 @@ pub fn visualize_nav_path(
     settings: Res<NavigationVisualSettings>,
     profiling: Res<ProfilingBuffer>,
 ) {
-    let _scope = ProfileScope::new(&profiling, "core::navigation::visualize::visualize_nav_path", &["pathfinding", "path", "debug", "visual"]);
-    
+    profile_scope!(&profiling, "core::navigation::visualize::visualize_nav_path", &["pathfinding", "path", "debug", "visual"]);
     if !settings.paths {
         return;
     }
-
     for entity in &existing_paths {
         commands.entity(entity).despawn();
     }
-
     let layer = *NAV_PATH_UI_LAYER;
     let z = layer.depth_value();
-
     for pathfinder in &pathfinder_query {
         for waypoint in &pathfinder.path {
             commands.spawn((
@@ -114,16 +104,13 @@ pub fn visualize_nav_path(
                 NavPathVisualMarker,
             ));
         }
-
         if pathfinder.path.len() > 1 {
             for i in 0..pathfinder.path.len() - 1 {
                 let start = pathfinder.path[i];
                 let end = pathfinder.path[i + 1];
-                
                 let mid = (start + end) / 2.0;
                 let length = start.distance(end);
                 let angle = (end - start).y.atan2((end - start).x);
-
                 commands.spawn((
                     Sprite {
                         color: *PATH_LINE_COLOR,
@@ -148,22 +135,17 @@ pub fn visualize_agent_centers(
     settings: Res<NavigationVisualSettings>,
     profiling: Res<ProfilingBuffer>,
 ) {
-    let _scope = ProfileScope::new(&profiling, "core::navigation::visualize::visualize_agent_centers", &["pathfinding", "agent", "debug", "visual"]);
-    
+    profile_scope!(&profiling, "core::navigation::visualize::visualize_agent_centers", &["pathfinding", "agent", "debug", "visual"]);
     if !settings.agents {
         return;
     }
-
     for entity in &existing_centers {
         commands.entity(entity).despawn();
     }
-
     let layer = *AGENT_CENTER_UI_LAYER;
     let z = layer.depth_value();
-
     for (_entity, transform, children, pathfinder) in &pathfinder_query {
         let center_pos = get_collider_world_position(transform, children, &child_query);
-        
         commands.spawn((
             Sprite {
                 color: *AGENT_CENTER_COLOR,
@@ -174,25 +156,20 @@ pub fn visualize_agent_centers(
             layer,
             AgentCenterVisualMarker,
         ));
-
         let half_size = pathfinder.agent_half_size;
         let segments = *AGENT_OUTLINE_SEGMENTS;
-        
         for i in 0..segments {
             let angle1 = (i as f32 / segments as f32) * std::f32::consts::TAU;
             let angle2 = ((i + 1) as f32 / segments as f32) * std::f32::consts::TAU;
-            
             let x1 = center_pos.x + angle1.cos() * half_size.x;
             let y1 = center_pos.y + angle1.sin() * half_size.y;
             let x2 = center_pos.x + angle2.cos() * half_size.x;
             let y2 = center_pos.y + angle2.sin() * half_size.y;
-            
             let start = Vec2::new(x1, y1);
             let end = Vec2::new(x2, y2);
             let mid = (start + end) / 2.0;
             let length = start.distance(end);
             let angle = (end - start).y.atan2((end - start).x);
-
             commands.spawn((
                 Sprite {
                     color: *AGENT_OUTLINE_COLOR,
