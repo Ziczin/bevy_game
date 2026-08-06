@@ -2,7 +2,7 @@
 enabled = true
 
 [modules]
-logging = true
+logging = false
 profiling = true
 visual = true
-overlay = true
+overlay = false

@@ -6,13 +6,12 @@ use crate::components::core::DepthLayer;
 use crate::core::config::from_toml;
 use super::buffer::DebugOverlay;
 
-// Загружаем размер шрифта из visual.toml
 from_toml!("config/debug/visual.toml", [
     OVERLAY_FONT_SIZE: f32 = "overlay.font_size",
 ]);
 
 #[derive(Component)]
-pub struct OverlayText; // <-- сделали публичным
+pub struct OverlayText;
 
 pub fn spawn_overlay(mut commands: Commands) {
     commands.spawn((
@@ -39,12 +38,11 @@ pub fn update_overlay(
     active_tags: Res<OverlayActiveTags>,
     mut text_query: Query<&mut Text, With<OverlayText>>,
 ) {
+    let content = overlay.format_filtered(&active_tags.0);
     if let Ok(mut text) = text_query.single_mut() {
-        let content = overlay.format_filtered(&active_tags.0);
         text.0 = content;
     }
 }
 
-/// Ресурс для хранения активных тегов оверлея.
 #[derive(Resource)]
 pub struct OverlayActiveTags(pub Vec<String>);

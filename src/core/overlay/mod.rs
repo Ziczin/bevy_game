@@ -16,8 +16,10 @@ pub struct DebugOverlayPlugin {
 #[cfg(debug_assertions)]
 impl Plugin for DebugOverlayPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<DebugOverlay>()
-            .insert_resource(OverlayActiveTags(self.config.active_tags.clone()))
+        if !app.world().contains_resource::<DebugOverlay>() {
+            app.insert_resource(DebugOverlay::new(true));
+        }
+        app.insert_resource(OverlayActiveTags(self.config.active_tags.clone()))
             .add_systems(Startup, spawn_overlay)
             .add_systems(Update, update_overlay);
     }
@@ -33,9 +35,12 @@ impl Plugin for DebugOverlayPlugin {
 
 #[cfg(debug_assertions)]
 pub fn setup_from_globals(app: &mut App, enabled_override: bool) {
+    app.insert_resource(DebugOverlay::new(enabled_override));
+
     if !enabled_override {
-        return; // не добавляем плагин
+        return;
     }
+
     use crate::core::config::from_toml;
     use crate::core::overlay::{OverlayPreset, DefaultOverlayPreset};
 

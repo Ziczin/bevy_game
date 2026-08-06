@@ -1,58 +1,50 @@
-use crate::components::core::DepthLayer;
 use crate::core::config::from_toml;
 use bevy::prelude::*;
 
-from_toml!("config/navigation/navigation.toml", [
-    NAV_GRID_CELL_SIZE: f32 = "grid.cell_size",
-    NAV_GRID_WIDTH: usize = "grid.width",
-    NAV_GRID_HEIGHT: usize = "grid.height",
-    ASTAR_ORTHOGONAL_COST: i32 = "astar.orthogonal_cost",
-    ASTAR_DIAGONAL_COST: i32 = "astar.diagonal_cost",
-    COLLIDER_MIN_SIZE: f32 = "physics.collider_min_size",
-    ELLIPSE_THRESHOLD: f32 = "physics.ellipse_threshold",
-    NO_ROTATION: f32 = "physics.no_rotation",
-]);
+from_toml!(
+    "config/navigation/visual.toml",
+    [
+        PATH_POINT_COLOR_VEC: Vec4 = "colors.path_point",
+        PATH_LINE_COLOR_VEC: Vec4 = "colors.path_line",
+        AGENT_CENTER_COLOR_VEC: Vec4 = "colors.agent_center",
+        AGENT_OUTLINE_COLOR_VEC: Vec4 = "colors.agent_outline",
+        PATH_POINT_SIZE: f32 = "sizes.path_point",
+        PATH_LINE_THICKNESS: f32 = "sizes.path_line_thickness",
+        AGENT_OUTLINE_THICKNESS: f32 = "sizes.agent_outline_thickness",
+        AGENT_OUTLINE_SCALE: f32 = "sizes.agent_outline_scale",
+    ]
+);
 
-from_toml!("config/navigation/visual.toml", [
-    GRID_WALKABLE_COLOR_VEC: Vec4 = "colors.grid_walkable",
-    GRID_BLOCKED_COLOR_VEC: Vec4 = "colors.grid_blocked",
-    PATH_POINT_COLOR_VEC: Vec4 = "colors.path_point",
-    PATH_LINE_COLOR_VEC: Vec4 = "colors.path_line",
-    AGENT_CENTER_COLOR_VEC: Vec4 = "colors.agent_center",
-    AGENT_OUTLINE_COLOR_VEC: Vec4 = "colors.agent_outline",
-    GRID_WALKABLE_SIZE: f32 = "sizes.grid_walkable",
-    GRID_BLOCKED_SIZE: f32 = "sizes.grid_blocked",
-    PATH_POINT_SIZE: f32 = "sizes.path_point",
-    PATH_LINE_THICKNESS: f32 = "sizes.path_line_thickness",
-    AGENT_OUTLINE_THICKNESS: f32 = "sizes.agent_outline_thickness",
-    AGENT_OUTLINE_SCALE: f32 = "sizes.agent_outline_scale",
-    NAV_GRID_UI_OFFSET: i32 = "layers.nav_grid_ui_offset",
-    NAV_PATH_UI_OFFSET: i32 = "layers.nav_path_ui_offset",
-]);
+from_toml!(
+    "config/navigation/navigation.toml",
+    [
+        ASTAR_ORTHOGONAL_COST: i32 = "astar.orthogonal_cost",
+        ASTAR_DIAGONAL_COST: i32 = "astar.diagonal_cost",
+        ASTAR_MAX_EXPANSIONS: usize = "astar.max_expansions",
+        ASTAR_MAX_SEARCHES_PER_FRAME: usize =
+            "astar.max_searches_per_frame",
+        ASTAR_STEP_DISTANCE_DIVISOR: f32 =
+            "astar.step_distance_divisor",
+        ASTAR_MIN_STEP: f32 = "astar.min_step",
+        ASTAR_MAX_STEP: f32 = "astar.max_step",
+        ASTAR_AGENT_OCCUPIED_MULTIPLIER: f32 =
+            "astar.agent_occupied_multiplier",
+        ASTAR_AGENT_CHECK_RADIUS_MULTIPLIER: f32 =
+            "astar.agent_check_radius_multiplier",
+        ASTAR_MAX_AGENT_CHECKS_PER_CELL: usize =
+            "astar.max_agent_checks_per_cell",
+        RAYCAST_COLLIDER_RADIUS_SCALE: f32 =
+            "raycast.collider_radius_scale",
+        RAYCAST_MIN_DISTANCE: f32 = "raycast.min_distance",
+        RAYCAST_STEP_RADIUS_SCALE: f32 = "raycast.step_radius_scale",
+        RAYCAST_MIN_STEP: f32 = "raycast.min_step",
+        RAYCAST_AGENT_COLLISION_MULTIPLIER: f32 =
+            "raycast.agent_collision_multiplier",
+        COLLIDER_MIN_SIZE: f32 = "physics.collider_min_size",
+        NO_ROTATION: f32 = "physics.no_rotation",
+    ]
+);
 
-pub static NAV_GRID_UI_LAYER: std::sync::LazyLock<DepthLayer> =
-    std::sync::LazyLock::new(|| DepthLayer::Ui(*NAV_GRID_UI_OFFSET as i16));
-pub static NAV_PATH_UI_LAYER: std::sync::LazyLock<DepthLayer> =
-    std::sync::LazyLock::new(|| DepthLayer::Ui(*NAV_PATH_UI_OFFSET as i16));
-
-pub static GRID_WALKABLE_COLOR: std::sync::LazyLock<Color> =
-    std::sync::LazyLock::new(|| {
-        Color::srgba(
-            GRID_WALKABLE_COLOR_VEC.x,
-            GRID_WALKABLE_COLOR_VEC.y,
-            GRID_WALKABLE_COLOR_VEC.z,
-            GRID_WALKABLE_COLOR_VEC.w,
-        )
-    });
-pub static GRID_BLOCKED_COLOR: std::sync::LazyLock<Color> =
-    std::sync::LazyLock::new(|| {
-        Color::srgba(
-            GRID_BLOCKED_COLOR_VEC.x,
-            GRID_BLOCKED_COLOR_VEC.y,
-            GRID_BLOCKED_COLOR_VEC.z,
-            GRID_BLOCKED_COLOR_VEC.w,
-        )
-    });
 pub static PATH_POINT_COLOR: std::sync::LazyLock<Color> =
     std::sync::LazyLock::new(|| {
         Color::srgba(
@@ -62,6 +54,7 @@ pub static PATH_POINT_COLOR: std::sync::LazyLock<Color> =
             PATH_POINT_COLOR_VEC.w,
         )
     });
+
 pub static PATH_LINE_COLOR: std::sync::LazyLock<Color> =
     std::sync::LazyLock::new(|| {
         Color::srgba(
@@ -71,6 +64,7 @@ pub static PATH_LINE_COLOR: std::sync::LazyLock<Color> =
             PATH_LINE_COLOR_VEC.w,
         )
     });
+
 pub static AGENT_CENTER_COLOR: std::sync::LazyLock<Color> =
     std::sync::LazyLock::new(|| {
         Color::srgba(
@@ -80,6 +74,7 @@ pub static AGENT_CENTER_COLOR: std::sync::LazyLock<Color> =
             AGENT_CENTER_COLOR_VEC.w,
         )
     });
+
 pub static AGENT_OUTLINE_COLOR: std::sync::LazyLock<Color> =
     std::sync::LazyLock::new(|| {
         Color::srgba(

@@ -1,11 +1,11 @@
 [navmesh]
-enabled = true
+enabled = false
 points = true
 paths = true
 agents = true
 
 [hitboxes]
-enabled = true
+enabled = false
 
 [overlay]
 font_size = 8.0   # только размер шрифта

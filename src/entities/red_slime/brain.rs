@@ -62,29 +62,40 @@ pub fn brain(
         else {
             logic_flags.remove(RedSlimeLogicFlags::CanMove); true
         };
+
+        // Обновление состояния и анимации
         if pathfinder.current_target.is_some() && pathfinder.is_active {
             if state_handler.set(RedSlimeState::Walk) {
                 debug_log!(&mut debug_log, &["red_slime"], "RedSlime {:?}: State -> Walk", entity);
                 sprite_sheet.switch(animation.walk.clone());
             }
+            // Постоянно обновляем направление к текущей цели
+            if let Some(target) = pathfinder.current_target {
+                let dir = (target - collider_pos).normalize_or_zero();
+                *velocity = dir.into();
+            }
         } else if sprite_sheet.progress.frame == expected_idle_frame && state_handler.set(RedSlimeState::Idle) {
             debug_log!(&mut debug_log, &["red_slime"], "RedSlime {:?}: State -> Idle", entity);
             sprite_sheet.switch(animation.idle.clone());
+            // Если перешли в Idle, сбрасываем направление
+            *velocity = Vec2::ZERO.into();
         }
+
+        // Обработка достижения waypoint (переход к следующему)
         if can_maneuver && let Some(target) = pathfinder.current_target {
             if (target - collider_pos).length() < waypoint_arrival_threshold {
                 debug_log!(&mut debug_log, &["red_slime", "pathfinding"], "RedSlime {:?}: Reached waypoint at ({:.1}, {:.1})", entity, target.x, target.y);
                 pathfinder.current_waypoint += 1;
                 if pathfinder.current_waypoint < pathfinder.path.len() {
-                    *velocity = if let Some(current_target) = Some(pathfinder.path[pathfinder.current_waypoint]) {
-                        pathfinder.current_target = Some(current_target);
-                        (current_target - collider_pos).normalize_or_zero()
-                    }
-                    else {
-                        Vec2::ZERO
-                    }.into();
+                    let next_target = pathfinder.path[pathfinder.current_waypoint];
+                    pathfinder.current_target = Some(next_target);
+                    // Направление обновится на следующем кадре, но можно сразу установить
+                    let dir = (next_target - collider_pos).normalize_or_zero();
+                    *velocity = dir.into();
                 } else {
                     pathfinder.current_target = None;
+                    // Сброс направления, чтобы остановиться
+                    *velocity = Vec2::ZERO.into();
                 }
             }
         }

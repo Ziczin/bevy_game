@@ -6,12 +6,12 @@ tags = ["default"]
 
 [[preset]]
 name = "all"
-tags = ["default", "camera", "player"]
+tags = ["default", "camera", "red_slime"]
 
 [[preset]]
 name = "camera_only"
 tags = ["camera"]
 
 [[preset]]
-name = "player_only"
-tags = ["player"]
+name = "slime_only"
+tags = ["red_slime"]
